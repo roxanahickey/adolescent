@@ -13,7 +13,8 @@ theme_cust <- theme_bw() +
         legend.background=element_blank(),
         strip.text=element_text(face="bold", size=8), 
         strip.background=element_blank(),
-        panel.background=element_blank())
+        panel.background=element_rect(fill="transparent", color = NA),
+        plot.background=element_rect(fill="transparent", color = NA))
 
 ## omit minor gridlines
 theme_cust_nominor <- theme_cust +

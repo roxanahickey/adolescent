@@ -1,10 +1,10 @@
-# Supplemental File 2: Assessment of vaginal microbiota composition with clustering and ordination analysis
+# Hierarchical clustering and ordination analysis of vaginal microbiota
 Roxana J. Hickey  
 
 # Description
 This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. Please refer to the paper for complete information about the objectives and study design.
 
-The embedded R code works through the first set of analyses and generation of figures related to the assessment of vaginal microbiota composition in girls and mothers. The analyses can be run directly in RStudio from the R Markdown file "adolescent-supp-02.Rmd" located at https://github.com/roxanahickey/adolescent. It should be run after "adolescent-supp-01.Rmd", which prepares the data and color palettes used in this script.
+The embedded R code works through the first set of analyses and generation of figures related to the assessment of vaginal microbiota composition in girls and mothers. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd", which prepares the data and color palettes used in this script.
 
 ## Objective
 The first major objective of this study is to characterize the composition of vaginal microbiota in girls both premenarche and postmenarche as well as mothers in this study. To do this we will first perform hierarchical clustering analysis of the vaginal microbiota from girls and mothers to determine what the major types of communities are and how they are distributed across the sample groups we are interested in. Then we will perform principal coordinates analysis to get a different perspective of the similarity among samples in relation to other variables of interest.
@@ -13,7 +13,7 @@ The first major objective of this study is to characterize the composition of va
 # Initial setup
 After running adolescent-supp-01.Rmd, two RData files named "01-data-prep-[date].RData" and "01-data-prep-last-run.RData" are saved in the data-postproc directory (two files are written so as to preserve older versions if necessary). Load either file to get all of the data necessary to run the analyses and generate figures below.
 
-*Note: If you run the R Markdown script 'as is' from the same directory containing it and the 'data-input' and 'data-postproc' subdirectories, all figures will be printed inside the resulting PDF or HTML output. If you want to save the figures as individual files, uncomment the lines below starting with 'dir.create()' as well as any lines throughout the script starting with 'ggsave()' or 'pdf()'. I made note of each of these within the chunk code.*
+*Note: If you run the R Markdown script 'as is' from the same directory containing it and the 'data' and 'data-postproc' subdirectories, all figures will be printed inside the resulting PDF or HTML output. If you want to save the figures as individual files, uncomment the lines below starting with 'dir.create()' as well as any lines throughout the script starting with 'ggsave()' or 'pdf()'. I made note of each of these within the chunk code.*
 
 
 ```r
@@ -25,10 +25,21 @@ load("data-postproc/01-data-prep-last-run.RData")
 
 ## Load packages
 library(ape)
+```
+
+```
+## Warning: package 'ape' was built under R version 3.1.1
+```
+
+```r
 library(cluster)
 library(gclus)
 library(ggplot2)
 library(gplots)
+```
+
+```
+## Warning: package 'gplots' was built under R version 3.1.1
 ```
 
 ```
@@ -70,8 +81,19 @@ library(vegan)
 
 ```r
 ## Uncomment the next two lines to create directories for figure output
-# dir.create("hclust-analysis")
-# dir.create("pcoa-analysis")
+dir.create("hclust")
+```
+
+```
+## Warning: 'hclust' already exists
+```
+
+```r
+dir.create("pcoa")
+```
+
+```
+## Warning: 'pcoa' already exists
 ```
 
 ## Subset data
@@ -103,7 +125,7 @@ spe.vag.hel.bc <- vegdist(spe.vag.hel, method="bray")
 ```
 
 ***
-# Part I: Perform hierarchical clustering
+# I: Perform hierarchical clustering
 
 ## Hierarchical clustering analysis
 The first set of analyses involves clustering the samples based on community composition and selecting the optimal clustering model and number of clusters. The approaches are based on those outlined in the following texts:
@@ -132,7 +154,7 @@ plot(spe.vag.hb.upgma, main="UPGMA, Hellinger/Bray")
 plot(spe.vag.hb.ward, main="Ward, Hellinger/Bray")
 ```
 
-![plot of chunk hclust-comparison](./adolescent-supp-02_files/figure-html/hclust-comparison.png) 
+![plot of chunk hclust-comparison](./02-hclust-pcoa_files/figure-html/hclust-comparison.png) 
 
 ```r
 dev.off()
@@ -216,7 +238,7 @@ axis(1, k.best, paste("optimum",k.best,sep="\n"), col="red", font=2, col.axis="r
 points(k.best, max(asw), pch=16, col="red", cex=1.5)
 ```
 
-![plot of chunk hclust-silhouette](./adolescent-supp-02_files/figure-html/hclust-silhouette.png) 
+![plot of chunk hclust-silhouette](./02-hclust-pcoa_files/figure-html/hclust-silhouette.png) 
 
 ```r
 cat("", "Silhouette-optimal number of clusters k =", k.best, "\n", 
@@ -244,14 +266,14 @@ plot(sil, main="Silhouette plot - Hellinger - UPGMA",
      cex.names=0.8, col=2:(k+1), nmax=100)
 ```
 
-![plot of chunk hclust-cut](./adolescent-supp-02_files/figure-html/hclust-cut1.png) 
+![plot of chunk hclust-cut](./02-hclust-pcoa_files/figure-html/hclust-cut1.png) 
 
 ```r
 ## Plot dendrogram with group labels
 hcoplot(spe.vag.hb.upgma, spe.vag.hel.bc, k=7)
 ```
 
-![plot of chunk hclust-cut](./adolescent-supp-02_files/figure-html/hclust-cut2.png) 
+![plot of chunk hclust-cut](./02-hclust-pcoa_files/figure-html/hclust-cut2.png) 
 
 Assign the group IDs as a new variable in the metadata and define colors/names for each group:
 
@@ -264,7 +286,7 @@ meta.vag$hclust <- cutg
 ## clusters and set colors that match the dominant taxon, if any)
 col.hclust.vag <- c("1"=col.taxa["Lactobacillus_iners"], 
                     "2"=col.taxa["Gardnerella_vaginalis"], 
-                    "3"="mediumturquoise", 
+                    "3"="slategrey", 
                     "4"=col.taxa["Lactobacillus_gasseri"], 
                     "5"=col.taxa["Lactobacillus_jensenii"], 
                     "6"=col.taxa["Lactobacillus_crispatus"], 
@@ -290,7 +312,7 @@ pie(rep(1,7), col=col.hclust.vag,
     labels=names(col.hclust.vag))
 ```
 
-![plot of chunk hclust-group-colors](./adolescent-supp-02_files/figure-html/hclust-group-colors.png) 
+![plot of chunk hclust-group-colors](./02-hclust-pcoa_files/figure-html/hclust-group-colors.png) 
 
 ```r
 dev.off()
@@ -316,7 +338,7 @@ pick <- order(csum,decreasing=TRUE)[1:25]
 
 ## Plot the dendrogram and heatmap with selected metadata 
 ## Uncomment the next line to save as a PDF
-# pdf("hclust-analysis/fig-1-hclust-heatmap.pdf", width=12, height=8, pointsize=10)
+# pdf("figures/fig-1-hclust-heatmap.pdf", width=12, height=8, pointsize=10)
 fcol <- cbind(col.meta.vag$men.stat, col.meta.vag$type, col.meta.vag$hclust)
 colnames(fcol) <- c("Menarche Status", "Girl/Mom", "Group")
 par(oma=c(2,2,2,2), lwd=0.75)
@@ -347,7 +369,7 @@ legend(0.4, -0.085, legend=c("Girl", "Mother", "Pre", "Post"),
        bg="#ffffff55", inset=0, cex=0.8, ncol=2)
 ```
 
-![plot of chunk fig-1-hclust-heatmap](./adolescent-supp-02_files/figure-html/fig-1-hclust-heatmap.png) 
+![plot of chunk fig-1-hclust-heatmap](./02-hclust-pcoa_files/figure-html/fig-1-hclust-heatmap.png) 
 
 ```r
 dev.off()
@@ -410,7 +432,7 @@ gg.hclust.clust <- ggplot(vag.hclust.count.lg,
 print(gg.hclust.clust)
 ```
 
-![plot of chunk hclust-count-prop](./adolescent-supp-02_files/figure-html/hclust-count-prop.png) 
+![plot of chunk hclust-count-prop](./02-hclust-pcoa_files/figure-html/hclust-count-prop.png) 
 
 ```r
 ## Plot cluster assignment by sample type
@@ -463,7 +485,7 @@ gg.hclust.prop <- ggplot(subset(vag.hclust.prop.lg, prop>0),
 
 ```r
 ## Uncomment the next line to save as a PDF
-# pdf("hclust-analysis/fig-2-hclust-count-prop-comparison.pdf", width=8, height=5)
+# pdf("figures/fig-2-hclust-count-prop.pdf", width=8, height=5)
 multiplot(gg.hclust.type + 
             ggtitle("a") + 
             theme(legend.position="none", 
@@ -480,7 +502,7 @@ multiplot(gg.hclust.type +
 ## Warning: Removed 1 rows containing missing values (geom_path).
 ```
 
-![plot of chunk fig-2-hclust-sampletype](./adolescent-supp-02_files/figure-html/fig-2-hclust-sampletype.png) 
+![plot of chunk fig-2-hclust-sampletype](./02-hclust-pcoa_files/figure-html/fig-2-hclust-sampletype.png) 
 
 ```r
 dev.off()
@@ -511,7 +533,7 @@ gg.hclust.vag.samp <- ggplot(meta.vag,
   scale_y_discrete(limits=c("mom.vag", "girl.vag"), 
                    labels=c("Mother Vagina", "Girl Vagina"),
                    name="") +
-  scale_x_discrete(1:14, name="Visit No.") +
+  scale_x_discrete(1:14, name="Visit") +
   theme_cust +
   theme(axis.title=element_text(size=8),
         axis.text=element_text(size=6),
@@ -521,11 +543,11 @@ gg.hclust.vag.samp <- ggplot(meta.vag,
 print(gg.hclust.vag.samp)
 ```
 
-![plot of chunk fig-3-hclust-over-time](./adolescent-supp-02_files/figure-html/fig-3-hclust-over-time.png) 
+![plot of chunk fig-3-hclust-over-time](./02-hclust-pcoa_files/figure-html/fig-3-hclust-over-time.png) 
 
 ```r
 ## Uncomment the next line to save as a PDF
-# ggsave("hclust-analysis/fig-3-hclust-time.pdf", width=8, height=5, units="in")
+# ggsave("figures/fig-3-hclust-time.pdf", width=8, height=5, units="in")
 ```
 
 ### Cleanup
@@ -535,11 +557,12 @@ rm(spe.vag.hb.single, spe.vag.hb.complete, spe.vag.hb.ward,
    spe.vag.hb.single.coph, spe.vag.hb.complete.coph, spe.vag.hb.upgma.coph, 
    spe.vag.hb.ward.coph, gow.vag.dist.single, gow.vag.dist.complete, 
    gow.vag.dist.upgma, gow.vag.dist.ward, asw, sil, k.best, k, cutg, 
-   csum, pick, fcol, df, ord)
+   csum, pick, fcol, df, ord, gg.hclust.clust, gg.hclust.prop, 
+   gg.hclust.type, gg.hclust.vag.samp)
 ```
 
 ***
-# Part II: Perform principal coordinates analysis (PCoA)
+# II: Perform principal coordinates analysis (PCoA)
 
 Now we perform PCoA to obtain a more nuanced picture of the similarities and differences among vaginal samples. PCoA is an ordination technique that, like principal components analysis (PCA), projects the distance or dissimilarity among objects (i.e., samples) onto a reduced set of orthogonal axes that maximize the variance explained by their multivariate descriptors (i.e., taxon abundances). Unlike PCA, it can be performed on any distance or dissimilarity matrix and need not conform to the Euclidean distance requirement of PCA. Therefore it is ideal to use with our Bray-Curtis dissimilarity matrix computed from Hellinger-standardized taxon abundance data. Again, the approaches below are based on those outlined in the following texts:
 
@@ -626,7 +649,7 @@ col.tb.vag.alpha15 <- makeTransparent(col.meta.vag$tan.br.dr, alpha=0.15)
 col.tb.vag.alpha80 <- makeTransparent(col.meta.vag$tan.br.dr, alpha=0.80)
 
 ## Uncomment the next line to save as a PDF
-# pdf("pcoa-analysis/fig-4-pcoa-tanner-br-2D.pdf", width=6, height=6, pointsize=10)
+# pdf("figures/fig-4-pcoa-tanner-br.pdf", width=6, height=6, pointsize=10)
 ordiplot(scores(spe.vag.hb.pcoa), type="n", xlab="PCoA axis 1", ylab="PCoA axis 2")
 ```
 
@@ -648,7 +671,7 @@ legend("bottomright", bty="n", title="Sample Type",
        pch=c(1,16,17), col=c(rep("black",2), col.type["mom"]))
 ```
 
-![plot of chunk fig-4-pcoa-tanner-br](./adolescent-supp-02_files/figure-html/fig-4-pcoa-tanner-br.png) 
+![plot of chunk fig-4-pcoa-tanner-br](./02-hclust-pcoa_files/figure-html/fig-4-pcoa-tanner-br.png) 
 
 ```r
 dev.off()
@@ -664,7 +687,7 @@ We get slightly better separation when we include the third axis:
 
 ```r
 ## Uncomment the next line to save as a PDF
-# pdf("pcoa-analysis/vag-pcoa-tanner-br-3D.pdf", width=6, height=6, pointsize=10)
+# pdf("pcoa/vag-pcoa-tanner-br-3D.pdf", width=6, height=6, pointsize=10)
 p1 <- ordiplot3d(spe.vag.hb.pcoa, display="sites", choices=c(1,3,2), 
                  xlab="PCoA Axis 1", ylab="PCoA Axis 3", zlab="PCoA Axis 2", 
                  type="h", ax.col="gray70", adj=0, box=FALSE, mar=c(4,3,0,3), 
@@ -677,7 +700,7 @@ legend("topright", bty="n", bg="white", legend=c("1","2","3","4","5","NA"),
        title="Tanner Breast", fill=c(col.tanner,"gray50"))
 ```
 
-![plot of chunk pcoa-tanner-br-3D](./adolescent-supp-02_files/figure-html/pcoa-tanner-br-3D.png) 
+![plot of chunk pcoa-tanner-br-3D](./02-hclust-pcoa_files/figure-html/pcoa-tanner-br-3D.png) 
 
 ```r
 dev.off()
@@ -700,7 +723,7 @@ col.hclust.vag.alpha15 <- makeTransparent(col.meta.vag$hclust, alpha=0.15)
 col.hclust.vag.alpha80 <- makeTransparent(col.meta.vag$hclust, alpha=0.80)
 
 ## Uncomment the next line to save as a PDF
-# pdf("pcoa-analysis/fig-s2-pcoa-hclust-2D.pdf", width=6, height=6, pointsize=10)
+# pdf("supplemental/fig-s2-pcoa-hclust.pdf", width=6, height=6, pointsize=10)
 ordiplot(scores(spe.vag.hb.pcoa), type="n", xlab="PCoA axis 1", ylab="PCoA axis 2")
 ```
 
@@ -723,7 +746,7 @@ legend("bottomright", bty="n", title="Sample Type",
        pch=c(1,16,17))
 ```
 
-![plot of chunk fig-s2-pcoa-hclust](./adolescent-supp-02_files/figure-html/fig-s2-pcoa-hclust.png) 
+![plot of chunk fig-s2-pcoa-hclust](./02-hclust-pcoa_files/figure-html/fig-s2-pcoa-hclust.png) 
 
 ```r
 dev.off()
@@ -738,7 +761,7 @@ And again, we can plot in 3D (this allows us to separate out the points near the
 
 ```r
 ## Uncomment the next line to save as a PDF
-# pdf("pcoa-analysis/pcoa-hclust-3D.pdf", width=6, height=6, pointsize=10)
+# pdf("pcoa/vag-pcoa-hclust-3D.pdf", width=6, height=6, pointsize=10)
 p1 <- ordiplot3d(spe.vag.hb.pcoa, display="sites", choices=c(1,3,2), 
                  xlab="PCoA Axis 1", ylab="PCoA Axis 3", zlab="PCoA Axis 2", 
                  type="h", ax.col="gray70", adj=0, box=FALSE, mar=c(4,3,0,3), 
@@ -751,7 +774,7 @@ legend("topright", bty="n", bg="white", legend=sort(names(col.hclust.vag)),
        title="Cluster Group", fill=col.hclust.vag[sort(names(col.hclust.vag))])
 ```
 
-![plot of chunk pcoa-hclust-3D](./adolescent-supp-02_files/figure-html/pcoa-hclust-3D.png) 
+![plot of chunk pcoa-hclust-3D](./02-hclust-pcoa_files/figure-html/pcoa-hclust-3D.png) 
 
 ```r
 dev.off()
@@ -767,7 +790,7 @@ We can also make a "biplot" that shows the eigenvectors (this indicates which va
 
 ```r
 ## Uncomment the next line to save as a PDF
-# pdf("pcoa-analysis/pcoa-biplot-2D.pdf", width=6, height=6, pointsize=10)
+# pdf("pcoa/vag-pcoa-biplot.pdf", width=6, height=6, pointsize=10)
 ordiplot(scores(spe.vag.hb.pcoa), type="n", xlab="PCoA axis 1", ylab="PCoA axis 2")
 ```
 
@@ -788,7 +811,7 @@ legend("bottomright", bty="n", title="Sample Type",
        pch=c(1,16,17))
 ```
 
-![plot of chunk pcoa-biplot](./adolescent-supp-02_files/figure-html/pcoa-biplot.png) 
+![plot of chunk pcoa-biplot](./02-hclust-pcoa_files/figure-html/pcoa-biplot.png) 
 
 ```r
 dev.off()
@@ -805,7 +828,7 @@ Color-coding by girl-mom pair:
 
 ```r
 ## Uncomment the next line to save as a PDF
-# pdf("pcoa-analysis/vag-pcoa-girl-mom-2D.pdf", width=6, height=6, pointsize=10)
+# pdf("pcoa/vag-pcoa-girl-mom.pdf", width=6, height=6, pointsize=10)
 ordiplot(scores(spe.vag.hb.pcoa), type="n", xlab="PCoA axis 1", ylab="PCoA axis 2")
 ```
 
@@ -828,7 +851,7 @@ legend("bottomright", bty="n", title="Sample Type",
        pch=c(1,16,10,17))
 ```
 
-![plot of chunk pcoa-extra-subjects](./adolescent-supp-02_files/figure-html/pcoa-extra-subjects.png) 
+![plot of chunk pcoa-extra-subjects](./02-hclust-pcoa_files/figure-html/pcoa-extra-subjects.png) 
 
 ```r
 dev.off()
@@ -843,7 +866,7 @@ Color-coding by race:
 
 ```r
 ## Uncomment next line to save as PDF
-# pdf("pcoa-analysis/vag-pcoa-race-2D.pdf", width=6, height=6, pointsize=10)
+# pdf("pcoa/vag-pcoa-race.pdf", width=6, height=6, pointsize=10)
 ordiplot(scores(spe.vag.hb.pcoa), type="n", xlab="PCoA axis 1", ylab="PCoA axis 2")
 ```
 
@@ -869,7 +892,7 @@ legend("bottomright", bty="n", title="Sample Type",
        pch=c(1,16,10,17))
 ```
 
-![plot of chunk pcoa-extra-race](./adolescent-supp-02_files/figure-html/pcoa-extra-race.png) 
+![plot of chunk pcoa-extra-race](./02-hclust-pcoa_files/figure-html/pcoa-extra-race.png) 
 
 ```r
 dev.off()
@@ -884,7 +907,8 @@ dev.off()
 
 ```r
 rm(spe.vag.hb.c.pcoa, spe.vag.hb.pcoa.2, col.tb.vag.alpha15, col.tb.vag.alpha80, 
-   col.hclust.vag.alpha15, col.hclust.vag.alpha80, p1)
+   col.hclust.vag.alpha15, col.hclust.vag.alpha80, p1, vag.hclust.count.lg,
+   vag.hclust.count.wd, vag.hclust.prop, vag.hclust.prop.lg)
 ```
 
 ***
@@ -893,8 +917,6 @@ This will save the workspace (data) in two separate images: one named with today
 
 
 ```r
-save.image(paste("data-postproc/02-cluster-pcoa-", Sys.Date(), ".RData", sep=""))
-save.image(paste("data-postproc/02-cluster-pcoa-last-run.RData", sep=""))
+save.image(paste("data-postproc/02-hclust-pcoa-", Sys.Date(), ".RData", sep=""))
+save.image(paste("data-postproc/02-hclust-pcoa-last-run.RData", sep=""))
 ```
-
-End of Supplemental File 2. Next, move on to *Supplemental File 3. Analysis of vaginal microbiota dynamics in association with pubertal development.*

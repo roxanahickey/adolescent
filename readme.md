@@ -2,7 +2,7 @@
 
 This repository contains the data and code necessary to reproduce the analyses and figures presented in the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. in review as of October 2014.
 
-The analyses are separated into five files available as regular Markdown (.md), R Markdown (.Rmd) and HTML (.html) files:
+The analyses are separated into five sections available in regular Markdown (.md), R Markdown (.Rmd) and HTML (.html) format:
 * 01-data-prep includes the initial setup of taxon data, participant metadata, and custom functions and color palettes.
 * 02-hclust-pcoa covers the hierarchical clustering and ordination (PCoA) approaches used to compare vaginal microbiota samples.
 * 03-community-dynamics generates Appendix S2 and goes through exploratory data analysis of vaginal microbiota dynamics.

@@ -1,10 +1,12 @@
 # Vaginal microbiota dynamics and pubertal development
-Roxana J. Hickey  
+Roxana J. Hickey <roxana.hickey@gmail.com>  
+Last updated October 8, 2014  
 
+***
 # Description
-This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. Please refer to the paper for complete information about the objectives and study design.
+This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. in review as of October 2014. The code works through qualitative analyses and generation of figures related to community dynamics of vaginal and vulvar microbiota over time. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd" and "02-hclust-pcoa.Rmd".
 
-The embedded R code works through the first set of analyses and generation of figures related to the assessment of vaginal microbiota composition in girls and mothers. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd" and "02-hclust-pcoa.Rmd".
+See the project repository at http://github.com/roxanahickey/adolescent for more information.
 
 ## Objective
 Earlier analyses dealt with characterizing vaginal microbiota composition and identifying major groups using clustering and ordination approaches. Next, we will take a closer look at the dynamics of these communities over time as girls progress through puberty and menarche. Special attention is devoted to assessing trends in the relative abundance of lactic acid bacteria and vaginal pH, as these are generally considered indicators of a 'healthy' vaginal microbiota in reproductive age women.
@@ -59,6 +61,39 @@ library(gridExtra)
 library(reshape)
 library(scales)
 
+## Display session info
+sessionInfo()
+```
+
+```
+## R version 3.1.0 (2014-04-10)
+## Platform: x86_64-apple-darwin10.8.0 (64-bit)
+## 
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## attached base packages:
+## [1] grid      stats     graphics  grDevices utils     datasets  methods  
+## [8] base     
+## 
+## other attached packages:
+## [1] scales_0.2.4    reshape_0.8.5   gridExtra_0.9.1 gplots_2.14.1  
+## [5] ggplot2_1.0.0   ape_3.1-4      
+## 
+## loaded via a namespace (and not attached):
+##  [1] bitops_1.0-6       caTools_1.17       colorspace_1.2-4  
+##  [4] digest_0.6.4       evaluate_0.5.5     formatR_0.10      
+##  [7] gdata_2.13.3       gtable_0.1.2       gtools_3.4.1      
+## [10] htmltools_0.2.4    KernSmooth_2.23-12 knitr_1.6         
+## [13] lattice_0.20-29    lme4_1.1-7         MASS_7.3-33       
+## [16] Matrix_1.1-4       minqa_1.2.3        munsell_0.4.2     
+## [19] nlme_3.1-117       nloptr_1.0.4       plyr_1.8.1        
+## [22] proto_0.3-10       Rcpp_0.11.2        reshape2_1.4      
+## [25] rmarkdown_0.2.49   splines_3.1.0      stringr_0.6.2     
+## [28] tools_3.1.0        yaml_2.1.13
+```
+
+```r
 ## Function to get rid of pesky auto-factor (acknowledgement: Matthew W. Pennell, University of Idaho)
 unfactor <- function(x){
   as.character(levels(x))[x]
@@ -297,6 +332,7 @@ dev.off()
 ##           1
 ```
 
+***
 # II. _Gardnerella_ in perimenarcheal vaginal microbiota
 
 _Gardnerella vaginalis_ was surprisingly common among girls in our study. This is notable because the species (or genus) is commonly associated with bacterial vaginosis, and some have argued it is acquired through sexual contact. However, the girls in this study had no history of sexual activity and reported themselves in good health. Below we plot the changes in proportion of _Gardnerella_ over time in girls who had at least 5% _Gardnerella_ in her vaginal microbiota at any point in time during the study.
@@ -428,6 +464,7 @@ gg.girl.gard + geom_line(lty=3, alpha=0.5) +
 
 ![plot of chunk gardnerella-vag-vul](./03-community-dynamics_files/figure-html/gardnerella-vag-vul.png) 
 
+***
 # III. Trends in LAB and vaginal pH with pubertal development
 
 ## Correlation of Tanner scores
@@ -603,7 +640,7 @@ print(box.lab.logit.ms)
 ![plot of chunk lab-trends](./03-community-dynamics_files/figure-html/lab-trends3.png) 
 
 ```r
-## Scatterplot of LAB.logit ~ age (significant in linear model)
+## Scatterplot of LAB.logit ~ age
 gg.lab.logit.age <- ggplot(subset(meta, type=="girl" & site=="vag"), 
                            aes(y=LAB.logit, x=age.sampling))
 scatter.lab.logit.age <- gg.lab.logit.age + 
@@ -618,7 +655,7 @@ print(scatter.lab.logit.age)
 ![plot of chunk lab-trends](./03-community-dynamics_files/figure-html/lab-trends4.png) 
 
 ```r
-## Boxplot of LAB.logit ~ subject (significant in linear model)
+## Boxplot of LAB.logit ~ subject
 gg.lab.logit.sub <- ggplot(subset(meta, type=="girl" & site=="vag"), 
                            aes(y=LAB.logit, x=subject, fill=subject))
 box.lab.logit.sub <- gg.lab.logit.sub + 
@@ -701,7 +738,7 @@ print(box.ph.ms)
 ![plot of chunk ph-trends](./03-community-dynamics_files/figure-html/ph-trends3.png) 
 
 ```r
-## Scatterplot of pH ~ age (significant in linear model)
+## Scatterplot of pH ~ age
 gg.ph.age <- ggplot(subset(meta, type=="girl" & site=="vag"), 
                     aes(y=ph, x=age.sampling))
 scatter.ph.age <- gg.ph.age + 
@@ -720,7 +757,7 @@ print(scatter.ph.age)
 ![plot of chunk ph-trends](./03-community-dynamics_files/figure-html/ph-trends4.png) 
 
 ```r
-## Boxplot of ph ~ subject (significant in linear model)
+## Boxplot of ph ~ subject
 gg.ph.sub <- ggplot(subset(meta, type=="girl" & site=="vag"), 
                     aes(y=ph, x=subject, fill=subject))
 box.ph.sub <- gg.ph.sub + 
@@ -739,6 +776,14 @@ print(box.ph.sub)
 ```
 
 ![plot of chunk ph-trends](./03-community-dynamics_files/figure-html/ph-trends5.png) 
+
+```r
+# pdf("misc/lab-logit-ph-age-subject.pdf", width=12, height=9)
+# multiplot(scatter.lab.logit.age, scatter.ph.age,
+#           box.lab.logit.sub, box.ph.sub,
+#           layout=matrix(c(1,2,3,4), ncol=2, byrow=TRUE))
+# dev.off()
+```
 
 ## Figure 6. Trends in relative abundance of lactic acid bacteria and vaginal pH in relation to pubertal development and menarche status.
 198 vaginal swabs were collected from 31 girls over time. Upper and lower panels show box plots of (a) the logit-transformed proportion of lactic acid bacteria (LAB; includes _Lactobacillus_, _Streptococcus_, _Aerococcus_ and _Facklamia_) and (b) vaginal pH. Box plots show the relationship to Tanner breast stage (left column), to Tanner pubic stage (middle) and menarche status (right). In each plot the rectangular box represents the interquartile range, the whiskers represent the upper and lower quartiles, the horizontal line represents the median, and open circles represent outliers.
@@ -795,9 +840,9 @@ dev.off()
 
 ## Discordance between high LAB and low pH
 
-An interesting observation was that not all samples with high proportions of LAB were associated with a low pH. We hypothesized this could be due to lower total bacterial counts in the vaginas of adolescent girls. We performed a coarse test of that hypothesis (see Supplemental File 5, 'adolescent-supp-05.Rmd) but were unable to detect a significant difference in estimated number of 16S rRNA gene copies.
+An interesting observation was that not all samples with high proportions of LAB were associated with a low pH. We hypothesized this could be due to lower total bacterial counts in the vaginas of adolescent girls. We performed a coarse test of that hypothesis but were unable to detect a significant difference in estimated number of 16S rRNA gene copies.
 
-## Figure 7. Relationship between proportion of lactic acid bacteria and pH in vaginal samples collected from girls.
+## Figure S6. Relationship between proportion of lactic acid bacteria and pH in vaginal samples collected from girls.
 197 vaginal microbiota samples from girls are plotted to show the relationship between the proportion of lactic acid bacteria (LAB; includes _Lactobacillus_, _Streptococcus_, _Aerococcus_ and _Facklamia_) on the x-axis and vaginal pH on the y-axis. Menarche status is either premenarcheal (open circles) or postmenarcheal (filled circles). Points are color-coded to indicate Tanner breast stage as indicated by the legend at right (NA values are colored gray). Points are slightly jittered to decrease crowding around similar values, but not so much as to distort interpretation of the data. The magenta dashed line at vaginal pH 4.5 represents the upper range of the traditional ‘hallmark’ healthy vaginal pH of 4.0-4.5.
 
 
@@ -819,12 +864,16 @@ gg.lab.ph + geom_hline(yintercept=4.5, linetype=2, color="#8B1C62", alpha=0.8) +
 ## Warning: Removed 68 rows containing missing values (geom_point).
 ```
 
-![plot of chunk fig-7-lab-ph](./03-community-dynamics_files/figure-html/fig-7-lab-ph.png) 
+![plot of chunk fig-s6-lab-ph](./03-community-dynamics_files/figure-html/fig-s6-lab-ph.png) 
 
 ```r
 # Uncomment line below to save as PDF
-# ggsave("figures/fig-7-lab-ph-scatterplot.pdf", width=8, height=6, units="in")
+# ggsave("supplemental/fig-s6-lab-ph-scatterplot.pdf", width=8, height=6, units="in")
 ```
+
+***
+# Save R workspace
+This will save the workspace (data) in two separate images: one named with today's date, in case you ever need to restore that version, and another with a non-dated name that can be easily loaded into subsequent analyses.
 
 ### Cleanup
 
@@ -841,10 +890,6 @@ rm(meta.fig5, meta.girl.gard.10, meta.girl.gard.10.fullobs, meta.vag.gard.10,
    gg.taxa.bar.109, gg.tb.dot.102, gg.tb.dot.103, gg.tb.dot.107, gg.tb.dot.109,
    gg.tb.dr.self, gg.tg.dr.self, scatter.lab.logit.age, scatter.ph.age, taxa.pick40)
 ```
-
-***
-# Save R workspace
-This will save the workspace (data) in two separate images: one named with today's date, in case you ever need to restore that version, and another with a non-dated name that can be easily loaded into subsequent analyses.
 
 
 ```r

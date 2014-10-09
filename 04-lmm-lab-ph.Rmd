@@ -1,0 +1,407 @@
+---
+title: "Linear mixed-effects modeling of trends in lactic acid bacteria proportion
+  and vaginal pH"
+author: "Roxana J. Hickey <roxana.hickey@gmail.com>"
+date: "Last updated October 8, 2014"
+output:
+  html_document:
+    keep_md: yes
+    toc: yes
+  pdf_document:
+    toc: yes
+---
+
+***
+# Description
+This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. in review as of October 2014. The code works through linear mixed effects modeling of trends observed in lactic acid bacteria and vaginal pH of perimenarcheal girls. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd", "02-hclust-pcoa.Rmd" and "03-community-dynamics.Rmd".
+
+See the project repository at http://github.com/roxanahickey/adolescent for more information.
+
+## Objective
+Previously in our qualitative assessment of vaginal microbiota dynamic trends over time, we saw that lactic acid bacteria (LAB) tended to increase as girls progressed through puberty, while vaginal pH decreased. This analysis attempts to explain and quantify the observed trends in relation to Tanner stage, menarche status, and age.
+
+***
+# Initial setup
+
+Clear the workspace, load data from the previous step, and load necessary packages.
+
+```{r setup}
+## Clear current workspace
+rm(list=ls())
+
+load("data-postproc/03-community-dynamics-last-run.RData")
+
+library(ggplot2)
+library(lme4)
+library(lmerTest)
+
+## Display session info
+sessionInfo()
+```
+
+***
+# I: Set up for linear mixed effects modeling of LAB and vaginal pH
+*Note: In order to perform linear regression on proportional data (e.g., LAB proportions), the data should be approximately normally distributed. However, our proportions of LAB are heavily skewed with many close to 1 and quite a few close to zero, with far less in the middle. Previously, in the third segment of our analyses, we created a logit-transformed LAB proportion variable termed "LAB.logit". We will use this variable rather than direct LAB proportions for constructing our mixed effects models.*
+
+## Set up data
+First we make a dataframe with the variables we are interested in testing. Then we separate it into two dataframes for testing LAB and pH separately, excluding any subjects with less than 3 observations in each case. For LAB, this removes subjects 110, 118 and 129 (all with just one observation). In addition to those, for pH this removes subjects 115, 116, 123, 125, 126, 127, 134 and 135. This should help with controlling the error estimates.
+
+```{r prep-data}
+## Subset metadata to only girl vagina samples and variables of interest
+data <- meta[meta$type=="girl" & meta$site=="vag",
+             c("subject", "tan.br.dr", "tan.gen.dr",
+               "age.sampling", "men.stat", 
+               "LAB", "LAB.logit", "ph")]
+
+## Set these variables as factors
+data$tan.br.dr <- factor(data$tan.br.dr, ordered = TRUE)
+data$tan.gen.dr <- factor(data$tan.gen.dr, ordered = TRUE)
+data$men.stat <- factor(data$men.stat, levels=c("pre","post"))
+data$subject <- factor(data$subject)
+
+data.lab <- data[!(data$subject %in% c(110,118,129)),]
+data.lab$ph <- NULL
+
+data.ph <- data[!(data$subject %in% c(110,115,116,118,123,125,127,129,134,135)),]
+data.ph$LAB <- NULL
+data.ph$LAB.logit <- NULL
+```
+
+## Exploratory data analysis
+It is a good idea to start out with some basic plots or exploratory data analysis so we have an idea of what kinds of trends to expect in the data.
+
+### Plot trends within individuals over time
+View trends in LAB, LAB.logit and pH over time within individuals.
+
+```{r eda-time-trends}
+## LAB
+gg.lab <- ggplot(data.lab, aes(x=age.sampling, y=LAB, group=subject, shape=men.stat)) +
+  geom_point(size=3) +
+  facet_wrap( ~ subject, ncol=4) +
+  scale_shape_manual(values=c(1, 16), 
+                     breaks=c("pre", "post"), 
+                     labels=c("Pre", "Post"),
+                     name="Menarche\nStatus", na.value=10) +
+  stat_smooth(method = "loess") +
+  xlab("Age at sampling") +
+  ylab("LAB proportion") +
+  ylim(c(0, 1)) +
+  theme_cust_nominor +
+  theme(axis.text=element_text(size=6))
+
+suppressWarnings(print(gg.lab))
+
+# ggsave("misc/lab-age-per-subject.pdf", width=10, height=8, units="in")
+
+## LAB.logit
+gg.lablogit <- ggplot(data.lab, aes(x=age.sampling, y=LAB.logit, group=subject, shape=men.stat)) +
+  geom_point(size=3) +
+  facet_wrap( ~ subject, ncol=4) +
+  scale_shape_manual(values=c(1,16), 
+                     breaks=c("pre", "post"), 
+                     labels=c("Pre", "Post"),
+                     name="Menarche\nStatus", na.value=10) +
+  stat_smooth(method = "loess") +
+  xlab("Age at sampling") +
+  ylab("Logit-transformed LAB proportion") +
+  ylim(c(-10, 10)) +
+  theme_cust_nominor +
+  theme(axis.text=element_text(size=6))
+
+suppressWarnings(print(gg.lablogit))
+
+# ggsave("misc/lab-logit-age-per-subject.pdf", width=10, height=8, units="in")
+
+## pH
+gg.ph <- ggplot(data.ph, aes(x=age.sampling, y=ph, group=subject, shape=men.stat)) +
+  geom_point(size=3) +
+  facet_wrap( ~ subject, ncol=4) +
+  scale_shape_manual(values=c(1,16), 
+                     breaks=c("pre", "post"), 
+                     labels=c("Pre", "Post"),
+                     name="Menarche\nStatus", na.value=10) +
+  stat_smooth(method = "loess") +
+  xlab("Age at sampling") +
+  ylab("Vaginal pH") +
+  ylim(c(4,7.5)) +
+  theme_cust_nominor +
+  theme(axis.text=element_text(size=6))
+
+suppressWarnings(print(gg.ph))
+
+# ggsave("misc/ph-age-per-subject.pdf", width=10, height=8, units="in")
+```
+
+### Box plots showing relationship with Tanner stage, menarche status
+
+```{r eda-boxplots}
+# pdf("misc/boxplots-tanner-menstat.pdf", width=11, height=8.5, pointsize=8)
+par(mfrow=c(2,2), mar=c(4,4,2,2))
+boxplot(LAB.logit ~ tan.br.dr*men.stat, 
+        xlab="Tanner breast * menarche status", 
+        ylab="Logit-transformed LAB proportion",
+        col=c(rep(col.men.stat[3], 5), rep(col.men.stat[2], 5)), 
+        data.lab)
+boxplot(LAB.logit ~ tan.gen.dr*men.stat, 
+        xlab="Tanner pubic * menarche status", 
+        ylab="Logit-transformed LAB proportion",
+        col=c(rep(col.men.stat[3], 5), rep(col.men.stat[2], 5)), 
+        data.lab)
+boxplot(ph ~ tan.br.dr*men.stat, 
+        xlab="Tanner breast * menarche status", 
+        ylab="Vaginal pH",
+        col=c(rep(col.men.stat[3], 5), rep(col.men.stat[2], 5)),
+        data.ph)
+boxplot(ph ~ tan.gen.dr*men.stat, 
+        xlab="Tanner pubic * menarche status", 
+        ylab="Vaginal pH",
+        col=c(rep(col.men.stat[3], 5), rep(col.men.stat[2], 5)),
+        data.ph)
+dev.off()
+```
+
+From these plots we probably expect to see a positive trend in LAB.logit and decreasing trend in pH with respect to either Tanner breast or pubic scores. There may also be a significant interaction between Tanner score and menarche status, particularly for pH, so this is something we'll want to look at in our models. However, since Tanner breast and pubic scores are highly correlated (based on the nature of the scores, and we also quantified this using Pearson correlations), it doesn't make sense to include both factors as fixed effects due to their colinearity. It likely doesn't matter which one we select, but below I have set up some simple models to compare (two each for LAB.logit and pH). In each model, subject is a random effect (meaning we are controlling for non-independence among repeat samples from the same subject), and the only fixed effect is either Tanner breast or pubic score. We are omitting any rows with NA values since not all samples have complete observations for both Tanner scores.
+
+### Test whether using Tanner breast or pubic scores makes a difference
+
+```{r compare-tanner}
+# come back to this
+(fit1a <- lmer(LAB.logit ~ factor(tan.br.dr) + (1|subject), data=na.omit(data.lab), contrasts=list(`factor(tan.br.dr)`=MASS::contr.sdif)))
+(fit1b <- lmer(LAB.logit ~ factor(tan.gen.dr) + (1|subject), data=na.omit(data.lab), contrasts=list(`factor(tan.gen.dr)`=MASS::contr.sdif)))
+anova(fit1b, fit1a)
+
+(fit1c <- lmer(ph ~ factor(tan.br.dr) + (1|subject), data=na.omit(data.ph), contrasts=list(`factor(tan.br.dr)`=MASS::contr.sdif)))
+(fit1d <- lmer(ph ~ factor(tan.gen.dr) + (1|subject), data=na.omit(data.ph), contrasts=list(`factor(tan.gen.dr)`=MASS::contr.sdif)))
+anova(fit1d, fit1c)
+```
+
+For both LAB.logit and pH, comparing the two models with an ANOVA shows they are not significantly different. Therefore, we can pick either factor. I chose to use Tanner breast since there are more observations overall (189 for breast, 183 for genital). Both Tanner scores are present for all 123 non-NA pH data points. For consistency we'll use Tanner breast scores for modeling both variables. **I also tested Tanner pubic scores; these are included at the end of this analysis, although they are not discussed in depth in the manuscript.**
+
+***
+# II: Linear mixed effects modeling of LAB (using Tanner breast scores)
+
+## Stepwise model comparisons
+```{r lmer-lab-tb}
+# Simplest model with only Tanner breast, controlling for subject
+(lab.fit.null <- lmer(LAB.logit ~ (1|subject), data=data.lab))
+(lab.fit1 <- lmer(LAB.logit ~ factor(tan.br.dr) + (1|subject), 
+                  data=data.lab, contrasts=list(`factor(tan.br.dr)`=MASS::contr.sdif)))
+anova(lab.fit1, lab.fit.null) # p = 2.187e-13 *** -> keep tan.br.dr
+summary(lab.fit1)
+
+# Add menarche status
+(lab.fit2 <- lmer(LAB.logit ~ factor(tan.br.dr) + men.stat + (1|subject), 
+                  data=data.lab, contrasts=list(`factor(tan.br.dr)`=MASS::contr.sdif)))
+anova(lab.fit2, lab.fit1) # p = 0.3777 -> men.stat ns, keep model 1
+
+# Add age
+(lab.fit3 <- lmer(LAB.logit ~ factor(tan.br.dr) + age.sampling + (1|subject), 
+                  data=data.lab, contrasts=list(`factor(tan.br.dr)`=MASS::contr.sdif)))
+anova(lab.fit3, lab.fit1) # p = 0.03752 * -> age.sampling signif, keep model 3
+summary(lab.fit3)
+
+# Add interaction with term
+(lab.fit4 <- lmer(LAB.logit ~ factor(tan.br.dr)*age.sampling + (1|subject), 
+                  data=data.lab, contrasts=list(`factor(tan.br.dr)`=MASS::contr.sdif)))
+anova(lab.fit4, lab.fit3) # p = 0.06579 . -> interaction term is only marginally signif
+summary(lab.fit4)
+
+# Compare models with AIC
+AIC(lab.fit1, lab.fit3, lab.fit4) # model 4 is slightly preferred, but we'll keep model 3
+
+# Compare 'best' model to null
+anova(lab.fit3, lab.fit.null)
+
+## Specify selected model
+fit.pick <- lab.fit3
+
+## Check assumptions
+par(mfrow=c(1,2))
+plot(fitted(fit.pick), residuals(fit.pick), main="Residuals")
+abline(h=0, col="blue")
+qqnorm(residuals(fit.pick))
+qqline(residuals(fit.pick), col="blue")
+```
+
+## Preliminary conclusion & testing of random slopes models
+Selected model for LAB.logit is Tanner breast + age. But we're not done yet. What we have above is a "random intercept model" where we assume the effects are the same across all subjects. We should compare this to a "random slope model" where subjects are allowed to have different intercepts and slopes for the main effects.
+
+```{r lmer-lab-randomslopes}
+(lab.fit6 <- lmer(LAB.logit ~ tan.br.dr + age.sampling + (1+tan.br.dr|subject), 
+                  data=data.lab))
+coef(lab.fit6) # all slopes positive, but magnitude varies
+summary(lab.fit6)
+
+(lab.fit7 <- lmer(LAB.logit ~ tan.br.dr + age.sampling + (1+age.sampling|subject), 
+                  data=data.lab))
+coef(lab.fit7) # slopes vary, but most positive
+summary(lab.fit7)
+```
+
+From the coefficients we can see that allowing slope to vary with respect to Tanner stage changes the intercepts and slopes only slightly from individual to individual. Allowing slope to vary on age is a little less consistent across individuals.
+
+***
+# III: Linear mixed effects modeling of vaginal pH (using Tanner breast scores)
+
+## Stepwise model comparisons
+```{r lmer-ph-tb}
+# Simplest model with only Tanner breast, controlling for subject
+(ph.fit.null <- lmer(ph ~ (1|subject), data=data.ph))
+(ph.fit1 <- lmer(ph ~ factor(tan.br.dr) + (1|subject), 
+                 data=data.ph, contrasts=list(`factor(tan.br.dr)`=MASS::contr.sdif)))
+anova(ph.fit1, ph.fit.null) # p = 0.0001597 *** -> keep tan.br.dr
+summary(ph.fit1)
+
+# Add menarche status
+(ph.fit2 <- lmer(ph ~ factor(tan.br.dr) + men.stat + (1|subject), 
+                 data=data.ph, contrasts=list(`factor(tan.br.dr)`=MASS::contr.sdif)))
+anova(ph.fit2, ph.fit1) # p = 0.01078 * -> men.stat signif, keep model 2
+summary(ph.fit2)
+
+# Add age
+(ph.fit3 <- lmer(ph ~ factor(tan.br.dr) + men.stat + age.sampling + (1|subject), 
+                 data=data.ph, contrasts=list(`factor(tan.br.dr)`=MASS::contr.sdif)))
+anova(ph.fit3, ph.fit2) # p = 0.005643 ** -> age signif, keep model 3
+summary(ph.fit3)
+
+# Add menarche interaction
+(ph.fit4 <- lmer(ph ~ factor(tan.br.dr)*men.stat + age.sampling + (1|subject), 
+                 data=data.ph, contrasts=list(`factor(tan.br.dr)`=MASS::contr.sdif)))
+anova(ph.fit4, ph.fit3) # p = 0.08574 . -> interaction only marginally signif
+
+# Add age interaction
+(ph.fit5 <- lmer(ph ~ factor(tan.br.dr)*age.sampling + men.stat + (1|subject), 
+                 data=data.ph, contrasts=list(`factor(tan.br.dr)`=MASS::contr.sdif)))
+anova(ph.fit5, ph.fit3) # p = 0.7912 -> interaction ns
+
+AIC(ph.fit3, ph.fit4) # AIC scores very close, so keep simpler model 3
+
+# Compare 'best' model to null
+anova(ph.fit3, ph.fit.null)
+
+## Specify selected model
+fit.pick <- ph.fit3
+
+## Check assumptions
+par(mfrow=c(1,2))
+plot(fitted(fit.pick), residuals(fit.pick), main="Residuals")
+abline(h=0, col="blue")
+qqnorm(residuals(fit.pick))
+qqline(residuals(fit.pick), col="blue")
+```
+
+Best model for pH is Tanner breast + menarche status + age. Now check the random slopes model.
+
+## Preliminary conclusion & testing of random slopes models
+```{r lmer-ph-randomslopes}
+(ph.fit6 <- lmer(ph ~ tan.br.dr + men.stat + age.sampling + (1+tan.br.dr|subject), data=data.ph))
+coef(ph.fit6) # slope negative for all but subject 112
+
+(ph.fit7 <- lmer(ph ~ tan.br.dr + men.stat + age.sampling + (1+men.stat|subject), data=data.ph))
+coef(ph.fit7) # slope varies
+
+(ph.fit8 <- lmer(ph ~ tan.br.dr + men.stat + age.sampling + (1+age.sampling|subject), data=data.ph))
+coef(ph.fit8) # slope negative for all
+```
+
+***
+# IV. Additional models using Tanner pubic scores
+
+## LAB
+```{r lmer-lab-tp}
+# Simplest model with only Tanner breast, controlling for subject
+(lab.fit.null <- lmer(LAB.logit ~ (1|subject), data=data.lab))
+(lab.fit1 <- lmer(LAB.logit ~ factor(tan.gen.dr) + (1|subject), 
+                  data=data.lab, contrasts=list(`factor(tan.gen.dr)`=MASS::contr.sdif)))
+anova(lab.fit1, lab.fit.null) # p = 2.2e-16 *** -> keep tan.gen.dr
+summary(lab.fit1)
+
+# Add menarche status
+(lab.fit2 <- lmer(LAB.logit ~ factor(tan.gen.dr) + men.stat + (1|subject), 
+                  data=data.lab, contrasts=list(`factor(tan.gen.dr)`=MASS::contr.sdif)))
+anova(lab.fit2, lab.fit1) # p = 0.125 -> men.stat ns, keep model 1
+
+# Add age
+(lab.fit3 <- lmer(LAB.logit ~ factor(tan.gen.dr) + age.sampling + (1|subject), 
+                  data=data.lab, contrasts=list(`factor(tan.gen.dr)`=MASS::contr.sdif)))
+anova(lab.fit3, lab.fit1) # p = 0.08341 . -> age.sampling only marginally signif
+summary(lab.fit3)
+
+# Add interaction with term
+(lab.fit4 <- lmer(LAB.logit ~ factor(tan.gen.dr)*age.sampling + (1|subject), 
+                  data=data.lab, contrasts=list(`factor(tan.gen.dr)`=MASS::contr.sdif)))
+anova(lab.fit4, lab.fit3) # p = 0.0003954 *** -> interaction term is signif, keep model 4
+summary(lab.fit4)
+
+# Compare models with AIC
+AIC(lab.fit1, lab.fit3, lab.fit4) # model 4 is preferred
+
+# Compare 'best' model to null
+anova(lab.fit4, lab.fit.null)
+
+## Specify selected model
+fit.pick <- lab.fit4
+
+## Check assumptions
+par(mfrow=c(1,2))
+plot(fitted(fit.pick), residuals(fit.pick), main="Residuals")
+abline(h=0, col="blue")
+qqnorm(residuals(fit.pick))
+qqline(residuals(fit.pick), col="blue")
+```
+
+## Vaginal pH
+```{r lmer-ph-tp}
+# Simplest model with only Tanner breast, controlling for subject
+(ph.fit.null <- lmer(ph ~ (1|subject), data=data.ph))
+(ph.fit1 <- lmer(ph ~ factor(tan.gen.dr) + (1|subject), 
+                 data=data.ph, contrasts=list(`factor(tan.gen.dr)`=MASS::contr.sdif)))
+anova(ph.fit1, ph.fit.null) # p = 2.513e-10 *** -> keep tan.gen.dr
+summary(ph.fit1)
+
+# Add menarche status
+(ph.fit2 <- lmer(ph ~ factor(tan.gen.dr) + men.stat + (1|subject), 
+                 data=data.ph, contrasts=list(`factor(tan.gen.dr)`=MASS::contr.sdif)))
+anova(ph.fit2, ph.fit1) # p = 0.0232 * -> men.stat signif, keep model 2
+summary(ph.fit2)
+
+# Add age
+(ph.fit3 <- lmer(ph ~ factor(tan.gen.dr) + men.stat + age.sampling + (1|subject), 
+                 data=data.ph, contrasts=list(`factor(tan.gen.dr)`=MASS::contr.sdif)))
+anova(ph.fit3, ph.fit2) # p = 0.005065 ** -> age signif, keep model 3
+summary(ph.fit3)
+
+# Add menarche interaction
+(ph.fit4 <- lmer(ph ~ factor(tan.gen.dr)*men.stat + age.sampling + (1|subject), 
+                 data=data.ph, contrasts=list(`factor(tan.gen.dr)`=MASS::contr.sdif)))
+anova(ph.fit4, ph.fit3) # p = 0.7108 -> interaction ns
+
+# Add age interaction
+(ph.fit5 <- lmer(ph ~ factor(tan.gen.dr)*age.sampling + men.stat + (1|subject), 
+                 data=data.ph, contrasts=list(`factor(tan.gen.dr)`=MASS::contr.sdif)))
+anova(ph.fit5, ph.fit3) # p = 0.5662 -> interaction ns, keep model 3
+
+AIC(ph.fit3, ph.fit4, ph.fit5) # keep model 3
+
+# Compare 'best' model to null
+anova(ph.fit3, ph.fit.null)
+
+## Specify selected model
+fit.pick <- ph.fit3
+
+## Check assumptions
+par(mfrow=c(1,2))
+plot(fitted(fit.pick), residuals(fit.pick), main="Residuals")
+abline(h=0, col="blue")
+qqnorm(residuals(fit.pick))
+qqline(residuals(fit.pick), col="blue")
+```
+
+***
+# Save R workspace
+This will save the workspace (data) in two separate images: one named with today's date, in case you ever need to restore that version, and another with a non-dated name that can be easily loaded into subsequent analyses.
+
+```{r save-workspace}
+save.image(paste("data-postproc/04-lmm-lab-ph-", Sys.Date(), ".RData", sep=""))
+save.image(paste("data-postproc/04-lmm-lab-ph-last-run.RData", sep=""))
+```

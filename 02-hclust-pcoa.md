@@ -1,10 +1,12 @@
 # Hierarchical clustering and ordination analysis of vaginal microbiota
-Roxana J. Hickey  
+Roxana J. Hickey <roxana.hickey@gmail.com>  
+Last updated October 8, 2014  
 
+***
 # Description
-This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. Please refer to the paper for complete information about the objectives and study design.
+This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. in review as of October 2014. The code works through the first set of analyses and generation of figures related to the assessment of vaginal microbiota composition in girls and mothers. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd", which prepares the data and color palettes used in this script.
 
-The embedded R code works through the first set of analyses and generation of figures related to the assessment of vaginal microbiota composition in girls and mothers. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd", which prepares the data and color palettes used in this script.
+See the project repository at http://github.com/roxanahickey/adolescent for more information.
 
 ## Objective
 The first major objective of this study is to characterize the composition of vaginal microbiota in girls both premenarche and postmenarche as well as mothers in this study. To do this we will first perform hierarchical clustering analysis of the vaginal microbiota from girls and mothers to determine what the major types of communities are and how they are distributed across the sample groups we are interested in. Then we will perform principal coordinates analysis to get a different perspective of the similarity among samples in relation to other variables of interest.
@@ -80,20 +82,44 @@ library(vegan)
 ```
 
 ```r
-## Uncomment the next two lines to create directories for figure output
-dir.create("hclust")
+## Display session info
+sessionInfo()
 ```
 
 ```
-## Warning: 'hclust' already exists
+## R version 3.1.0 (2014-04-10)
+## Platform: x86_64-apple-darwin10.8.0 (64-bit)
+## 
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## attached base packages:
+## [1] grid      stats     graphics  grDevices utils     datasets  methods  
+## [8] base     
+## 
+## other attached packages:
+##  [1] vegan_2.0-10         lattice_0.20-29      permute_0.8-3       
+##  [4] scatterplot3d_0.3-35 reshape_0.8.5        plyr_1.8.1          
+##  [7] gplots_2.14.1        ggplot2_1.0.0        gclus_1.3.1         
+## [10] cluster_1.15.2       ape_3.1-4           
+## 
+## loaded via a namespace (and not attached):
+##  [1] bitops_1.0-6       caTools_1.17       colorspace_1.2-4  
+##  [4] digest_0.6.4       evaluate_0.5.5     formatR_0.10      
+##  [7] gdata_2.13.3       gtable_0.1.2       gtools_3.4.1      
+## [10] htmltools_0.2.4    KernSmooth_2.23-12 knitr_1.6         
+## [13] lme4_1.1-7         MASS_7.3-33        Matrix_1.1-4      
+## [16] minqa_1.2.3        munsell_0.4.2      nlme_3.1-117      
+## [19] nloptr_1.0.4       proto_0.3-10       Rcpp_0.11.2       
+## [22] reshape2_1.4       rmarkdown_0.2.49   scales_0.2.4      
+## [25] splines_3.1.0      stringr_0.6.2      tools_3.1.0       
+## [28] yaml_2.1.13
 ```
 
 ```r
-dir.create("pcoa")
-```
-
-```
-## Warning: 'pcoa' already exists
+## Create directories for figure output
+# dir.create("hclust")
+# dir.create("pcoa")
 ```
 
 ## Subset data
@@ -409,32 +435,6 @@ vag.hclust.count.lg <- melt(vag.hclust.count.wd,
                             id.vars="type.site.men.stat")
 colnames(vag.hclust.count.lg) <- c("type.site.men.stat", "hclust", "count")
 
-## Plot sample by cluster assignment
-gg.hclust.clust <- ggplot(vag.hclust.count.lg,
-                          aes(x=hclust, y=count, fill=type.site.men.stat)) +
-  geom_bar(stat="identity") +
-  scale_fill_manual(values=c("gray70", "#67001F", "#EE6363", "#8B8B00"),
-                    breaks=c("girl.vag.pre", "girl.vag.post", 
-                             "mom.vag.mom.post", "girl.vag.NA"),
-                    labels=c("Girl Vagina Pre", "Girl Vagina Post", 
-                             "Mother Vagina", "Girl Vagina NA"),
-                    name="Sample Type") +
-  scale_x_discrete(limits=c("LC","LI","GV","Other","LG","LJ","Bifido")) +
-  xlab("Cluster Group") +
-  ylab("Count") +
-  theme_cust_nogrid +
-  theme(legend.justification=c(1,1), legend.position=c(1,1),
-        axis.title=element_text(size=8),
-        axis.text=element_text(size=6),
-        legend.title=element_text(face="bold", size=8),
-        legend.text=element_text(size=6))
-
-print(gg.hclust.clust)
-```
-
-![plot of chunk hclust-count-prop](./02-hclust-pcoa_files/figure-html/hclust-count-prop.png) 
-
-```r
 ## Plot cluster assignment by sample type
 gg.hclust.type <- ggplot(vag.hclust.count.lg, 
                          aes(x=type.site.men.stat, y=count, fill=hclust)) +
@@ -561,6 +561,10 @@ rm(spe.vag.hb.single, spe.vag.hb.complete, spe.vag.hb.ward,
    gg.hclust.type, gg.hclust.vag.samp)
 ```
 
+```
+## Warning: object 'gg.hclust.clust' not found
+```
+
 ***
 # II: Perform principal coordinates analysis (PCoA)
 
@@ -682,35 +686,6 @@ dev.off()
 ##           1
 ```
 
-We get slightly better separation when we include the third axis: 
-
-
-```r
-## Uncomment the next line to save as a PDF
-# pdf("pcoa/vag-pcoa-tanner-br-3D.pdf", width=6, height=6, pointsize=10)
-p1 <- ordiplot3d(spe.vag.hb.pcoa, display="sites", choices=c(1,3,2), 
-                 xlab="PCoA Axis 1", ylab="PCoA Axis 3", zlab="PCoA Axis 2", 
-                 type="h", ax.col="gray70", adj=0, box=FALSE, mar=c(4,3,0,3), 
-                 pch=".", color=col.tb.vag.alpha15, angle=30, lty.hplot=3)
-points(p1, "points", col=col.tb.vag.alpha80, pch=col.meta.vag$pch.sample.gp)
-legend("right", bty="n", bg="white", title="Sample Type",
-       legend=c("Pre", "Post", "Mother"), 
-       pch=c(1,16,17), , col=c(rep("black",2), col.type["mom"]))
-legend("topright", bty="n", bg="white", legend=c("1","2","3","4","5","NA"), 
-       title="Tanner Breast", fill=c(col.tanner,"gray50"))
-```
-
-![plot of chunk pcoa-tanner-br-3D](./02-hclust-pcoa_files/figure-html/pcoa-tanner-br-3D.png) 
-
-```r
-dev.off()
-```
-
-```
-## null device 
-##           1
-```
-
 We can also color-code the points using different variables, such as the hierarchical cluster assignments determined above. 
 
 ## Figure S2. PCoA of vaginal microbiota from girls and mothers. (color-coded by cluster assignment)
@@ -747,71 +722,6 @@ legend("bottomright", bty="n", title="Sample Type",
 ```
 
 ![plot of chunk fig-s2-pcoa-hclust](./02-hclust-pcoa_files/figure-html/fig-s2-pcoa-hclust.png) 
-
-```r
-dev.off()
-```
-
-```
-## null device 
-##           1
-```
-
-And again, we can plot in 3D (this allows us to separate out the points near the top, for instance)
-
-```r
-## Uncomment the next line to save as a PDF
-# pdf("pcoa/vag-pcoa-hclust-3D.pdf", width=6, height=6, pointsize=10)
-p1 <- ordiplot3d(spe.vag.hb.pcoa, display="sites", choices=c(1,3,2), 
-                 xlab="PCoA Axis 1", ylab="PCoA Axis 3", zlab="PCoA Axis 2", 
-                 type="h", ax.col="gray70", adj=0, box=FALSE, mar=c(4,3,0,3), 
-                 pch=".", color=col.hclust.vag.alpha15, angle=30, lty.hplot=3)
-points(p1, "points", col=col.hclust.vag.alpha80, pch=col.meta.vag$pch.sample.gp)
-legend("right", bty="n", bg="white", title="Sample Type",
-       legend=c("Pre", "Post", "Mother"), 
-       pch=c(1,16,17))
-legend("topright", bty="n", bg="white", legend=sort(names(col.hclust.vag)), 
-       title="Cluster Group", fill=col.hclust.vag[sort(names(col.hclust.vag))])
-```
-
-![plot of chunk pcoa-hclust-3D](./02-hclust-pcoa_files/figure-html/pcoa-hclust-3D.png) 
-
-```r
-dev.off()
-```
-
-```
-## null device 
-##           1
-```
-
-We can also make a "biplot" that shows the eigenvectors (this indicates which variables -- bacterial taxa -- contribute to separating samples along the axes):
-
-
-```r
-## Uncomment the next line to save as a PDF
-# pdf("pcoa/vag-pcoa-biplot.pdf", width=6, height=6, pointsize=10)
-ordiplot(scores(spe.vag.hb.pcoa), type="n", xlab="PCoA axis 1", ylab="PCoA axis 2")
-```
-
-```
-## Warning: Species scores not available
-```
-
-```r
-abline(h=0, lty=3, col="gray70")
-abline(v=0, lty=3, col="gray70")
-points(scores(spe.vag.hb.pcoa), 
-       col="gray70", 
-       pch=col.meta.vag$pch.sample.gp,
-       cex=1.3)
-text(spe.vag.hb.wa, rownames(spe.vag.hb.wa), cex=0.5, col="blue")
-legend("bottomright", bty="n", title="Sample Type",
-       legend=c("Pre", "Post", "Mother"), 
-       pch=c(1,16,17))
-```
-
-![plot of chunk pcoa-biplot](./02-hclust-pcoa_files/figure-html/pcoa-biplot.png) 
 
 ```r
 dev.off()
@@ -903,6 +813,10 @@ dev.off()
 ##           1
 ```
 
+***
+# Save R workspace
+This will save the workspace (data) in two separate images: one named with today's date, in case you ever need to restore that version, and another with a non-dated name that can be easily loaded into subsequent analyses.
+
 ### Cleanup
 
 ```r
@@ -911,9 +825,9 @@ rm(spe.vag.hb.c.pcoa, spe.vag.hb.pcoa.2, col.tb.vag.alpha15, col.tb.vag.alpha80,
    vag.hclust.count.wd, vag.hclust.prop, vag.hclust.prop.lg)
 ```
 
-***
-# Save R workspace
-This will save the workspace (data) in two separate images: one named with today's date, in case you ever need to restore that version, and another with a non-dated name that can be easily loaded into subsequent analyses.
+```
+## Warning: object 'p1' not found
+```
 
 
 ```r

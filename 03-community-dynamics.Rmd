@@ -1,18 +1,20 @@
 ---
 title: "Vaginal microbiota dynamics and pubertal development"
-author: "Roxana J. Hickey"
+author: "Roxana J. Hickey <roxana.hickey@gmail.com>"
+date: "Last updated October 8, 2014"
 output:
-  pdf_document:
-    toc: yes
   html_document:
     keep_md: yes
     toc: yes
+  pdf_document:
+    toc: yes
 ---
 
+***
 # Description
-This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. Please refer to the paper for complete information about the objectives and study design.
+This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. in review as of October 2014. The code works through qualitative analyses and generation of figures related to community dynamics of vaginal and vulvar microbiota over time. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd" and "02-hclust-pcoa.Rmd".
 
-The embedded R code works through the first set of analyses and generation of figures related to the assessment of vaginal microbiota composition in girls and mothers. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd" and "02-hclust-pcoa.Rmd".
+See the project repository at http://github.com/roxanahickey/adolescent for more information.
 
 ## Objective
 Earlier analyses dealt with characterizing vaginal microbiota composition and identifying major groups using clustering and ordination approaches. Next, we will take a closer look at the dynamics of these communities over time as girls progress through puberty and menarche. Special attention is devoted to assessing trends in the relative abundance of lactic acid bacteria and vaginal pH, as these are generally considered indicators of a 'healthy' vaginal microbiota in reproductive age women.
@@ -40,6 +42,9 @@ library(grid)
 library(gridExtra)
 library(reshape)
 library(scales)
+
+## Display session info
+sessionInfo()
 
 ## Function to get rid of pesky auto-factor (acknowledgement: Matthew W. Pennell, University of Idaho)
 unfactor <- function(x){
@@ -266,6 +271,7 @@ grid.arrange(gg.taxa.bar.107 + theme(plot.margin=unit(c(0.25, 1, 0, 0.8), "lines
 dev.off()
 ```
 
+***
 # II. _Gardnerella_ in perimenarcheal vaginal microbiota
 
 _Gardnerella vaginalis_ was surprisingly common among girls in our study. This is notable because the species (or genus) is commonly associated with bacterial vaginosis, and some have argued it is acquired through sexual contact. However, the girls in this study had no history of sexual activity and reported themselves in good health. Below we plot the changes in proportion of _Gardnerella_ over time in girls who had at least 5% _Gardnerella_ in her vaginal microbiota at any point in time during the study.
@@ -351,6 +357,7 @@ gg.girl.gard + geom_line(lty=3, alpha=0.5) +
   theme(axis.text=element_text(size=6))
 ```
 
+***
 # III. Trends in LAB and vaginal pH with pubertal development
 
 ## Correlation of Tanner scores
@@ -478,7 +485,7 @@ box.lab.logit.ms <- gg.lab.logit.ms +
 
 print(box.lab.logit.ms)
 
-## Scatterplot of LAB.logit ~ age (significant in linear model)
+## Scatterplot of LAB.logit ~ age
 gg.lab.logit.age <- ggplot(subset(meta, type=="girl" & site=="vag"), 
                            aes(y=LAB.logit, x=age.sampling))
 scatter.lab.logit.age <- gg.lab.logit.age + 
@@ -489,7 +496,7 @@ scatter.lab.logit.age <- gg.lab.logit.age +
 
 print(scatter.lab.logit.age)
 
-## Boxplot of LAB.logit ~ subject (significant in linear model)
+## Boxplot of LAB.logit ~ subject
 gg.lab.logit.sub <- ggplot(subset(meta, type=="girl" & site=="vag"), 
                            aes(y=LAB.logit, x=subject, fill=subject))
 box.lab.logit.sub <- gg.lab.logit.sub + 
@@ -545,7 +552,7 @@ box.ph.ms <- gg.ph.ms +
 
 print(box.ph.ms)
 
-## Scatterplot of pH ~ age (significant in linear model)
+## Scatterplot of pH ~ age
 gg.ph.age <- ggplot(subset(meta, type=="girl" & site=="vag"), 
                     aes(y=ph, x=age.sampling))
 scatter.ph.age <- gg.ph.age + 
@@ -556,7 +563,7 @@ scatter.ph.age <- gg.ph.age +
 
 print(scatter.ph.age)
 
-## Boxplot of ph ~ subject (significant in linear model)
+## Boxplot of ph ~ subject
 gg.ph.sub <- ggplot(subset(meta, type=="girl" & site=="vag"), 
                     aes(y=ph, x=subject, fill=subject))
 box.ph.sub <- gg.ph.sub + 
@@ -568,6 +575,12 @@ box.ph.sub <- gg.ph.sub +
   theme_cust
 
 print(box.ph.sub)
+
+# pdf("misc/lab-logit-ph-age-subject.pdf", width=12, height=9)
+# multiplot(scatter.lab.logit.age, scatter.ph.age,
+#           box.lab.logit.sub, box.ph.sub,
+#           layout=matrix(c(1,2,3,4), ncol=2, byrow=TRUE))
+# dev.off()
 ```
 
 ## Figure 6. Trends in relative abundance of lactic acid bacteria and vaginal pH in relation to pubertal development and menarche status.
@@ -608,12 +621,12 @@ dev.off()
 
 ## Discordance between high LAB and low pH
 
-An interesting observation was that not all samples with high proportions of LAB were associated with a low pH. We hypothesized this could be due to lower total bacterial counts in the vaginas of adolescent girls. We performed a coarse test of that hypothesis (see Supplemental File 5, 'adolescent-supp-05.Rmd) but were unable to detect a significant difference in estimated number of 16S rRNA gene copies.
+An interesting observation was that not all samples with high proportions of LAB were associated with a low pH. We hypothesized this could be due to lower total bacterial counts in the vaginas of adolescent girls. We performed a coarse test of that hypothesis but were unable to detect a significant difference in estimated number of 16S rRNA gene copies.
 
-## Figure 7. Relationship between proportion of lactic acid bacteria and pH in vaginal samples collected from girls.
+## Figure S6. Relationship between proportion of lactic acid bacteria and pH in vaginal samples collected from girls.
 197 vaginal microbiota samples from girls are plotted to show the relationship between the proportion of lactic acid bacteria (LAB; includes _Lactobacillus_, _Streptococcus_, _Aerococcus_ and _Facklamia_) on the x-axis and vaginal pH on the y-axis. Menarche status is either premenarcheal (open circles) or postmenarcheal (filled circles). Points are color-coded to indicate Tanner breast stage as indicated by the legend at right (NA values are colored gray). Points are slightly jittered to decrease crowding around similar values, but not so much as to distort interpretation of the data. The magenta dashed line at vaginal pH 4.5 represents the upper range of the traditional ‘hallmark’ healthy vaginal pH of 4.0-4.5.
 
-```{r fig-7-lab-ph, fig.width=8, fig.height=6}
+```{r fig-s6-lab-ph, fig.width=8, fig.height=6}
 ## LAB vs. ph
 gg.lab.ph <- ggplot(subset(meta, type=="girl" & site=="vag"), 
                     aes(x=LAB, y=ph, col=factor(tan.br.dr), shape=men.stat))
@@ -627,8 +640,12 @@ gg.lab.ph + geom_hline(yintercept=4.5, linetype=2, color="#8B1C62", alpha=0.8) +
   theme_cust
 
 # Uncomment line below to save as PDF
-# ggsave("figures/fig-7-lab-ph-scatterplot.pdf", width=8, height=6, units="in")
+# ggsave("supplemental/fig-s6-lab-ph-scatterplot.pdf", width=8, height=6, units="in")
 ```
+
+***
+# Save R workspace
+This will save the workspace (data) in two separate images: one named with today's date, in case you ever need to restore that version, and another with a non-dated name that can be easily loaded into subsequent analyses.
 
 ### Cleanup
 ```{r cleanup}
@@ -644,10 +661,6 @@ rm(meta.fig5, meta.girl.gard.10, meta.girl.gard.10.fullobs, meta.vag.gard.10,
    gg.taxa.bar.109, gg.tb.dot.102, gg.tb.dot.103, gg.tb.dot.107, gg.tb.dot.109,
    gg.tb.dr.self, gg.tg.dr.self, scatter.lab.logit.age, scatter.ph.age, taxa.pick40)
 ```
-
-***
-# Save R workspace
-This will save the workspace (data) in two separate images: one named with today's date, in case you ever need to restore that version, and another with a non-dated name that can be easily loaded into subsequent analyses.
 
 ```{r save-workspace}
 save.image(paste("data-postproc/03-community-dynamics-", Sys.Date(), ".RData", sep=""))

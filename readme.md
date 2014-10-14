@@ -11,6 +11,6 @@ The analyses are separated into five sections available in regular Markdown (.md
 
 View the Markdown files to see the full code and embedded figures.
 
-If you want to run the analyses yourself, you can fork this repository and run the RMarkdown scripts from the main directory. Data are in the data subdirectory, smaller scripts are in the scripts subdirectory, and output from my own run-through are stored in the various other subdirectories.
+If you want to run the analyses yourself, you can fork or clone this repository and run the RMarkdown scripts from the main directory. Data are in the data subdirectory, smaller scripts are in the scripts subdirectory, and output from my own run-through are stored in the various other subdirectories.
 
 Please direct any inquiries regarding the analyses to Roxana Hickey at <roxana.hickey@gmail.com>.

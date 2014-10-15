@@ -1,6 +1,6 @@
 ## Hickey et al. adolescent vaginal microbiome study
 
-![alt text](https://roxanahickey.files.wordpress.com/2014/10/silhouettes-lifetime-yellow.png)
+![alt text](https://roxanahickey.files.wordpress.com/2014/10/silhouettes-adol-yellow21.png)
 
 This repository contains the data and code necessary to reproduce the analyses and figures presented in the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. in preparation for submission (October 2014).
 

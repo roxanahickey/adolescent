@@ -4,7 +4,7 @@ Last updated October 8, 2014
 
 ***
 # Description
-This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. in review as of October 2014. The code works through the preparation of bacterial read abundance data (from Roche 454 pyrosequencing) and participant metadata for subsequent analysis. It also generates the custom color palettes used to make figures for downstream analyses. The analyses can be run directly from the R Markdown file using RStudio. Before starting, you will want to check that the necessary packages are installed (see the library calls in the first section).
+This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. to be submitted in November 2014. The code works through the preparation of bacterial read abundance data (from Roche 454 pyrosequencing) and participant metadata for subsequent analysis. It also generates the custom color palettes used to make figures for downstream analyses. The analyses can be run directly from the R Markdown file using RStudio. Before starting, you will want to check that the necessary packages are installed (see the library calls in the first section).
 
 See the project repository at http://github.com/roxanahickey/adolescent for more information.
 

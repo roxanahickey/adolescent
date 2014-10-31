@@ -4,7 +4,7 @@ Last updated October 8, 2014
 
 ***
 # Description
-This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. in review as of October 2014. The code works through linear mixed effects modeling of trends observed in lactic acid bacteria and vaginal pH of perimenarcheal girls. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd", "02-hclust-pcoa.Rmd" and "03-community-dynamics.Rmd".
+This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. to be submitted in November 2014. The code works through linear mixed effects modeling of trends observed in lactic acid bacteria and vaginal pH of perimenarcheal girls. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd", "02-hclust-pcoa.Rmd" and "03-community-dynamics.Rmd".
 
 See the project repository at http://github.com/roxanahickey/adolescent for more information.
 

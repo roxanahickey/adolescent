@@ -1,4 +1,4 @@
-## Hickey et al. adolescent vaginal microbiome study
+## Vaginal and vulvar microbiota of perimenarcheal girls
 
 ![alt text](https://roxanahickey.files.wordpress.com/2014/10/silhouettes-lifetime-yellow2.png)
 

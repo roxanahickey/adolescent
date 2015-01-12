@@ -13,6 +13,7 @@ The analyses are separated into five sections available in regular Markdown (.md
 * [04-lmm-lab-ph](https://github.com/roxanahickey/adolescent/blob/master/04-lmm-lab-ph.md) includes the linear mixed-effects modeling of trends in lactic acid bacteria proportions and pH in relation to participant metadata.
 * [05-vagina-vulva-comparison](https://github.com/roxanahickey/adolescent/blob/master/05-vagina-vulva-comparison.md) includes analyses performed to compare vaginal and vulvar microbiota samples.
 * [06-post-review](https://github.com/roxanahickey/adolescent/blob/master/06-post-review.md) includes additional analyses performed following an initial round of peer review. (added 2015-01-12)
+
 If you want to run the analyses yourself, you can fork or clone this repository and run the R Markdown scripts from the main directory. Data are in the data subdirectory, shorter scripts are in the scripts subdirectory, and output from my own run-through of the analyses are stored in the various other subdirectories.
 
 Please direct any inquiries regarding the analyses to Roxana Hickey at <roxana.hickey@gmail.com>.

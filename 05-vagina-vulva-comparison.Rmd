@@ -1,7 +1,7 @@
 ---
 title: "Comparisons of girls' vaginal and vulvar microbiota"
 author: "Roxana J. Hickey <roxana.hickey@gmail.com>"
-date: "Last updated October 8, 2014"
+date: "Last updated January 12, 2015"
 output:
   html_document:
     keep_md: yes
@@ -12,9 +12,11 @@ output:
 
 ***
 # Description
-This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. to be submitted in November 2014. The code works through comparisons of vaginal and vulvar microbiota of perimenarcheal girls. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd".
+This is a supplement to the paper "Vaginal microbiota of adolescent girls prior to the onset of menarche resemble those of reproductive-age women" by Hickey et al. The code works through comparisons of vaginal and vulvar microbiota of perimenarcheal girls. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd".
 
 See the project repository at http://github.com/roxanahickey/adolescent for more information.
+
+**Update 2015-01-08: I added “echo=FALSE” options to the chunks of code that make a graph. View full code in R Markdown script.**
 
 ## Objective
 In earlier analyses ("02-hclust-pcoa.Rmd", "03-community-dynamics.Rmd", "04-lmm-lab-ph.Rmd") we focused on vaginal microbiota; now we want to extend our analyses to compare vulvar microbiota alongside vaginal microbiota. Here we perform hierarchical clustering and PCoA with both vaginal and vulvar data (similar to in "02-hclust-pcoa.Rmd") in addition to correlation analysis (part III) and indicator species analysis (part IV).
@@ -43,8 +45,8 @@ sessionInfo()
 ***
 # I. Hierarchical clustering of vaginal and vulvar microbiota
 The first set of analyses involves clustering vaginal and vulvar samples based on bacterial community composition and selecting the optimal clustering model and number of clusters. The approaches are based on those outlined in the following texts:  
-* Legendre P, Legendre L. (2012). Cluster analysis. 3rd ed. Elsevier.
-* Borcard D, Gillet F, Legendre P. (2011). Numerical ecology with R. Springer.
+* Legendre P, Legendre L. (2012). _Cluster analysis._ 3rd ed. Elsevier.
+* Borcard D, Gillet F, Legendre P. (2011). _Numerical ecology with R._ Springer.
 
 ## Hellinger standardization of taxon abundance data
 First, we standardize our bacterial read abundances using the Hellinger method. This is a recommended approach when the "species" are sparsely populated at some sites, resulting in many zeros in the species abundance matrix. We then compute the Bray-Curtis dissimilarity matrix from the Hellinger standardized abundance matrix. This will be used in subsequent clustering and ordination analyses.
@@ -64,7 +66,7 @@ spe.hel.bc <- vegdist(spe.hel, method="bray")
 ## Hierarchical clustering
 Now we will perform hierarchical clustering using multiple linkage strategies (single, complete, average/UPGMA, Ward) and select the optimal one using Gower's distance. Then we'll select the optimal number of clusters using the maximum silhouette width.
 
-```{r hclust-comparison, fig.width=12, fig.height=8}
+```{r hclust-comparison, fig.width=12, fig.height=8, echo=FALSE}
 ## Compute hierarchical clustering using four linkage methods
 spe.hb.single <- hclust(spe.hel.bc, method="single")
 spe.hb.complete <- hclust(spe.hel.bc, method="complete")
@@ -104,7 +106,7 @@ gow.dist.single; gow.dist.complete; gow.dist.upgma; gow.dist.ward # Lowest score
 ## Selection of optimal number of clusters
 Now we pick the optimal number of clusters according silhouette widths (Rousseew quality index). To do this we plot the average silhouette widths for all partitions except for the trivial partition in a single group (k=1). We find that six clusters are identified as optimal.
 
-```{r hclust-silhouette, fig.width=8, fig.height=6}
+```{r hclust-silhouette, fig.width=8, fig.height=6, echo=FALSE}
 ## First, create an empty vector in which the asw values will be written
 asw <- numeric(nrow(spe.abund))
 
@@ -177,8 +179,10 @@ dev.off()
 
 Now we visualize community composition as a heatmap along with the UPGMA dendrogram and cluster assignments just determined:
 
-## Figure S7. Heatmap of the proportions of bacterial taxa in the vulvar and vaginal microbiota of girls and vaginal microbiota of mothers sampled longitudinally.
-```{r fig-s7-hclust-heatmap-hellinger-bray-upgma, fig.width=12, fig.height=8}
+## Figure S8. Bacterial community composition of the vulvar and vaginal microbiota of girls and vaginal microbiota of mothers sampled longitudinally.
+Each column in the dendrogram and heatmap represents the vulvar or vaginal microbiota sampled from a single individual at a single point in time. In total 456 samples are represented: 198 vaginal samples and 211 vulvar samples from 31 girls, and 47 vaginal samples from 24 mothers. e dendrogram represents the average linkage (UPGMA) hierarchical clustering of samples based on the Bray-Curtis dissimilarity matrix computed from Hellinger standardized taxon abundance data. The colored bars below the dendrogram represent sample type (girl/mother, vagina/vulva) and hierarchical cluster assignments. Clusters are named to signify the most abundant taxon, when applicable: LC (_Lactobacillus crispatus_ dominant, n=134), ‘Other’ (n=117), LI (_L. iners_, n=107), LG (_L. gasseri_, n=49), GV (_Gardnerella vaginalis_, n=47), and ‘Bifido’ (_Bifidobacterium_, n=3). e heatmap represents proportions (prior to Hellinger standardization) of the 25 overall most abundant taxa within each community as indicated by the legend at top right.
+
+```{r fig-s8-hclust-heatmap-hellinger-bray-upgma, fig.width=12, fig.height=8, echo=FALSE}
 ## Sort taxa by abundance (row-wise, by taxon)
 rsum <- rowSums(prop.red)
 
@@ -186,9 +190,9 @@ rsum <- rowSums(prop.red)
 pick <- order(rsum,decreasing=TRUE)[1:25]
 
 ## Plot the dendrogram and heatmap with selected metadata (uncomment the first line below to save as a PDF)
-# pdf("supplemental/fig-s7-hclust-heatmap-hellinger-bray-upgma.pdf", width=12, height=8, pointsize=10)
-fcol <- cbind(col.hclust[cutg], col.meta$site, col.meta$type)
-colnames(fcol) <- c("Group", "Site", "Girl/Mom")
+# pdf("supplemental/fig-s8-hclust-heatmap-hellinger-bray-upgma.pdf", width=12, height=8, pointsize=10)
+fcol <- cbind(col.meta$site, col.meta$type, col.hclust[cutg])
+colnames(fcol) <- c("Site", "Girl/Mother", "Cluster Group")
 par(oma=c(2,2,2,2), lwd=0.75)
 heatmap.3(prop.red[pick,],
           col=col.heatmap,
@@ -208,10 +212,10 @@ heatmap.3(prop.red[pick,],
           density.info="none",family="sans")
 par(oma=c(1,2,1,2), new=TRUE, xpd=TRUE)
 plot(0:1, 0:1, type = "n", axes = F, xlab="", ylab="")
-legend(0.15, -0.085, legend=sort(names(col.hclust)), title="Cluster", 
+legend(0.15, -0.085, legend=sort(names(col.hclust)), title="Cluster Group", 
        fill=col.hclust[order(names(col.hclust))], bty="n", 
        bg="#ffffff55", inset=0, cex=0.8, ncol=3)
-legend(0.4, -0.085, legend=c("Girl", "Mom", "Vagina", "Vulva"), title="Sample Type", 
+legend(0.4, -0.085, legend=c("Girl", "Mother", "Vagina", "Vulva"), title="Sample Type", 
        fill=c(col.type, col.site), bty="n", bg="#ffffff55", inset=0, cex=0.8, ncol=2)
 dev.off()
 ```
@@ -219,8 +223,8 @@ dev.off()
 ***
 # II. PCoA of vaginal and vulvar microbiota
 Now we perform PCoA to obtain a more nuanced picture of the similarities and differences among samples. Again, the approaches are based on those outlined in the following texts:  
-* Legendre P, Legendre L. (2012). *Cluster analysis*. 3rd ed. Elsevier.
-* Borcard D, Gillet F, Legendre P. (2011). *Numerical ecology with R*. Springer.
+* Legendre P, Legendre L. (2012). _Cluster analysis_. 3rd ed. Elsevier.
+* Borcard D, Gillet F, Legendre P. (2011). _Numerical ecology with R_. Springer.
 
 ## Setup PCoA
 *Note: the PCoA method below produces negative eigenvalues unless corrected, which can be problematic for interpreting the R^2\-like ratio (essentially variance explained by an eigenvalue in PCA). See Legendre & Legendre Numerical Ecology Ch 9 for more discussion of this (p. 505 in 3rd edition 2012). However, as long as the largest-value negative eigenvalue is smaller in absolute value than any of the positive eigenvalues of interest (typically the first two), the interpretation is still meaningful. A correction was suggested by Cailliez & Pagès to adjust the R^2\-like ratio when negative eigenvalues are present -- see Legendre & Legendre p. 506, eq. 9.48.*
@@ -262,7 +266,7 @@ Now we can plot the PCoA and overlay different variables with point shapes and c
 * Color-coding by hierarchical cluster group
 * Color-coding by body site
 
-```{r pcoa-vag-vul-hclust, fig.width=8, fig.height=8}
+```{r pcoa-vag-vul-hclust, fig.width=7, fig.height=7, echo=FALSE}
 ## Make semi-transparent colors for plotting 3D scatterplot
 col.hclust.alpha70 <- makeTransparent(col.hclust[meta$hclust], alpha=0.70)
 col.site.alpha70 <- makeTransparent(col.site[meta$site], alpha=0.70)
@@ -283,8 +287,8 @@ legend("topright", bty="n", title="Sample Type",
                 "mom vag"), 
        pch=c(1,16,10,0,15,12,17))
 legend("bottomright", bty="n", bg="white", legend=sort(names(col.hclust)), 
-       title="Cluster", fill=col.hclust[order(names(col.hclust))])
-dev.off()
+       title="Cluster Group", fill=col.hclust[order(names(col.hclust))])
+# dev.off()
 
 ## Colored by body site
 # pdf("misc/pcoa-girl-vag-vul-site.pdf", width=6, height=6, pointsize=10)
@@ -305,7 +309,7 @@ legend("topright", bty="n", title="Sample Type",
                 "mom vag"), 
        pch=c(1,16,10,0,15,12,17), col=c(rep("black", 6), col.type[2]))
 legend("bottomright", bty="n", legend=c("vag", "vul"), title="Site", fill=col.site[c("vag","vul")])
-dev.off()
+# dev.off()
 ```
 
 ***
@@ -349,7 +353,7 @@ gg.cor.vag.vul.sp + geom_point(size=3) +
 
 For curiosity's sake we can also compute the Pearson correlations (better to do so on the Hellinger-standardized abundance data so as to lessen effects of very high and very low abundances). The correlations are indeed higher for most cases except those with the starkest differences in composition. However, this should be interpreted with caution since Pearson assumes normal distributions and linear dependence among variables, and many taxa in our dataset have heavily skewed abundance distributions even after the Hellinger transformation (the Spearman method does not rely on these assumptions).
 
-```{r vag-vul-pearson, fig.width=8, fig.height=6}
+```{r vag-vul-pearson-setup}
 spe.hel <- decostand(t(abund.red), method="hellinger")
 spe.hel.vag.pr <- t(spe.hel[rownames(spe.hel) %in% meta.paired$sample.ID.vag,])
 spe.hel.vul.pr <- t(spe.hel[rownames(spe.hel) %in% meta.paired$sample.ID.vul,])
@@ -364,7 +368,9 @@ mean(cor.vag.vul.hel.pe.pr)
 median(cor.vag.vul.hel.pe.pr)
 
 meta.paired$cor.pearson.hellinger <- cor.vag.vul.hel.pe.pr
+```
 
+```{r vag-vul-pearson, fig.width=8, fig.height=6, echo=FALSE}
 gg.cor.vag.vul.pe <- ggplot(meta.paired, aes(x=visit, y=cor.pearson.hellinger, shape=men.stat))
 
 gg.cor.vag.vul.pe + geom_point(size=3) + 

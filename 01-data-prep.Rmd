@@ -1,7 +1,7 @@
 ---
 title: "Preparation of bacterial read abundance data and participant metadata"
 author: "Roxana J. Hickey <roxana.hickey@gmail.com> and Matthew L. Settles <mattsettles@gmail.com>"
-date: "Last updated October 8, 2014"
+date: "Last updated January 12, 2015"
 output:
   html_document:
     keep_md: yes
@@ -12,9 +12,11 @@ output:
 
 ***
 # Description
-This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. to be submitted in November 2014. The code works through the preparation of bacterial read abundance data (from Roche 454 pyrosequencing) and participant metadata for subsequent analysis. It also generates the custom color palettes used to make figures for downstream analyses. The analyses can be run directly from the R Markdown file using RStudio. Before starting, you will want to check that the necessary packages are installed (see the library calls in the first section).
+This is a supplement to the paper "Vaginal microbiota of adolescent girls prior to the onset of menarche resemble those of reproductive-age women" by Hickey et al. The code works through the preparation of bacterial read abundance data (from Roche 454 pyrosequencing) and participant metadata for subsequent analysis. It also generates the custom color palettes used to make figures for downstream analyses. The analyses can be run directly from the R Markdown file using RStudio. Before starting, you will want to check that the necessary packages are installed (see the library calls in the first section).
 
 See the project repository at http://github.com/roxanahickey/adolescent for more information.
+
+**Update 2015-01-08: I added "echo=FALSE" options to the chunks of code that make a graph. View full code in R Markdown script.**
 
 ***
 # Initial setup
@@ -159,8 +161,8 @@ abund$Level <- NULL
 rm(abund.gard, abund.gard.other, abund.gard.vaginalis,
    abund.lacto, abund.lacto.other, abund.lacto.spp,
    abund.strep, abund.strep.other, abund.strep.spp,
-   abund.g, abund.s, abund.tmp, da.g, da.s,
-   level.g, level.tmp, ord, rem)
+   abund.g, abund.s, abund.tmp, da.g, da.s, level.tmp, 
+   level.g, ord, rem)
 ```
 
 ## Check read counts
@@ -435,7 +437,7 @@ This section sets custom color palettes for use in plotting. Includes specific c
 * Bacterial taxa colors
 
 ## Define color palettes for participant metadata
-```{r col-meta, fig.width=12, fig.height=6}
+```{r col-meta, fig.width=12, fig.height=6, echo=FALSE}
 ## First, define a palette of 50 laboriously hand-selected colors
 col.50 <- c("#9E0142", "#D53E4F", "#EE2C2C", "#F46D43", "#7F3B08", 
             "#E08214", "#FF7F00", "#FFD700", "#B8E186", "#4D9221", 
@@ -577,11 +579,11 @@ df$order.col[!(df$Order %in% c("Lactobacillales",
                                "Bifidobacteriales",
                                "Coriobacterialies",
                                "Bacteroidales"))] <- colorRampPalette(Greys[2:8])(length(df$order.col[!(df$Order %in% c("Lactobacillales",
-                                                                                                                       "Clostridiales",
-                                                                                                                       "Actinomycetales",
-                                                                                                                       "Bifidobacteriales",
-                                                                                                                       "Coriobacterialies",
-                                                                                                                       "Bacteroidales"))]))
+                                                                                                                        "Clostridiales",
+                                                                                                                        "Actinomycetales",
+                                                                                                                        "Bifidobacteriales",
+                                                                                                                        "Coriobacterialies",
+                                                                                                                        "Bacteroidales"))]))
 
 ## Write new taxa color palette
 col.taxa <- df$order.col
@@ -601,9 +603,9 @@ source("./scripts/hcoplot.R") # from Borcard, Gillet and Legendre (2009) Numeric
 Finally, now that we have our bacterial abundance data, metadata and color palettes defined, we can make Figure S1, which is a summary of all the samples collected from girls and mothers during the study.
 
 ## Figure S1. Summary of all vaginal and vulvar samples collected from girls and mothers.
-Each subplot shows all of the vaginal and vulvar samples collected from an individual participant (circles), as well vaginal samples collected from her mother (triangles) when applicable. The x-axis indicates the clinical visit at which each sample was collected; visits occurred approximately every three months. Open circles signify premenarcheal status, and filled circles signify postmenarcheal status in girls. The menarcheal status was unknown for subject 133 at visit 6, indicated by an open circle with crosshatch. Points are color-coded to signify the Tanner breast stage of the girls as shown in the legend at top right (unknown and mother samples are colored gray).
+Each panel shows all of the vaginal and vulvar samples collected from an individual participant (circles), as well as vaginal samples collected from her mother (triangles) when applicable. The x-axis indicates the clinical visit at which each sample was collected; visits occurred approximately every three months. Open circles signify premenarcheal status, and filled circles signify postmenarcheal status in girls. e menarcheal status was unknown for subject 133 at visit 6, indicated by an open circle with crosshatch. Points are color-coded to signify the Tanner breast stage of the girls as shown in the legend at top right (mother samples and those with missing values are colored gray).
 
-```{r fig-s1-samplessummary, fig.width=8, fig.height=6}
+```{r fig-s1-samplessummary, fig.width=8, fig.height=6, echo=FALSE}
 ggplot(meta, aes(y=type.site, x=visit, color=factor(tan.br.dr), shape=men.stat)) +
   geom_point(size=3) + 
   facet_wrap( ~ gm.pair.fullID, ncol=4) +

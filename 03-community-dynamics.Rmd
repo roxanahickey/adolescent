@@ -1,7 +1,7 @@
 ---
 title: "Vaginal microbiota dynamics and pubertal development"
 author: "Roxana J. Hickey <roxana.hickey@gmail.com>"
-date: "Last updated October 8, 2014"
+date: "Last updated January 12, 2015"
 output:
   html_document:
     keep_md: yes
@@ -12,9 +12,11 @@ output:
 
 ***
 # Description
-This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. to be submitted in November 2014. The code works through qualitative analyses and generation of figures related to community dynamics of vaginal and vulvar microbiota over time. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd" and "02-hclust-pcoa.Rmd".
+This is a supplement to the paper "Vaginal microbiota of adolescent girls prior to the onset of menarche resemble those of reproductive-age women" by Hickey et al. The code works through qualitative analyses and generation of figures related to community dynamics of vaginal and vulvar microbiota over time. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd" and "02-hclust-pcoa.Rmd".
 
 See the project repository at http://github.com/roxanahickey/adolescent for more information.
+
+**Update 2015-01-08: I added “echo=FALSE” options to the chunks of code that make a graph. View full code in R Markdown script.**
 
 ## Objective
 Earlier analyses dealt with characterizing vaginal microbiota composition and identifying major groups using clustering and ordination approaches. Next, we will take a closer look at the dynamics of these communities over time as girls progress through puberty and menarche. Special attention is devoted to assessing trends in the relative abundance of lactic acid bacteria and vaginal pH, as these are generally considered indicators of a 'healthy' vaginal microbiota in reproductive age women.
@@ -55,7 +57,7 @@ unfactor <- function(x){
 ***
 # I: Summarize community dynamics of vaginal (and vulvar) microbiota
 
-First we will create an individual summary for each individual participant (and her mother, if applicable) to look at community composition of the vaginal and vulvar microbiota, along with selected metadata, at every visit during the study. The output is a PDF file with each page containing the following plots for a given subject:
+First we will create an individual summary for each individual participant (and her mother, if applicable) to look at community composition of the vaginal and vulvar microbiota, along with selected metadata, at every visit during the study. The output is a PDF file with each page containing the following plots for a given subject (these are referred to as Appendix S2 in the paper):
 
 * Community composition of girl's vaginal microbiota
 * Community composition of girl's vulvar microbiota
@@ -73,6 +75,7 @@ g_legend <- function(a.gplot){
   legend <- tmp$grobs[[leg]]
   return(legend)}
 
+# uncomment line below to write appendix S2
 # source("scripts/community_dynamics_profiles.R")
 ```
 
@@ -80,39 +83,39 @@ g_legend <- function(a.gplot){
 
 Next we will plot just a few examples of vaginal microbiota with _Lactobacillus_ predominant by menarche. I have selected subjects 102, 103, 107 and 109. We will plot only the vaginal microbiota composition, menarche status, and Tanner breast stage for each. This also requires a bit of setup:
 
-```{r fig-5-setup}
+```{r fig-4-setup}
 ## Subset prop and meta for subjects 102, 103, 107 and 109
-meta.fig5 <- subset(meta, subject %in% c(102, 103, 107, 109) & site=="vag")
-prop.fig5 <- prop.red[,colnames(prop.red) %in% rownames(meta.fig5)]
+meta.fig4 <- subset(meta, subject %in% c(102, 103, 107, 109) & site=="vag")
+prop.fig4 <- prop.red[,colnames(prop.red) %in% rownames(meta.fig4)]
 
-taxa.pick40 <- order(rowMeans(as.matrix(prop.fig5), na.rm=TRUE),
+taxa.pick40 <- order(rowMeans(as.matrix(prop.fig4), na.rm=TRUE),
                      decreasing=T)[1:40]
-prop.fig5.top40 <- prop.fig5[taxa.pick40,]
+prop.fig4.top40 <- prop.fig4[taxa.pick40,]
     
-mp.fig5 <- data.frame(cbind(as.character(meta.fig5$subject),
-                            meta.fig5$visit, 
-                            as.character(meta.fig5$men.stat),
-                            meta.fig5$tan.br.dr,
-                            t(prop.fig5.top40)))
-colnames(mp.fig5)[1:4] <- c("subject",
+mp.fig4 <- data.frame(cbind(as.character(meta.fig4$subject),
+                            meta.fig4$visit, 
+                            as.character(meta.fig4$men.stat),
+                            meta.fig4$tan.br.dr,
+                            t(prop.fig4.top40)))
+colnames(mp.fig4)[1:4] <- c("subject",
                             "visit",
                             "men.stat",
                             "tan.br.dr")
 
-mp.fig5.lg <- melt(mp.fig5, id.vars=c("subject",
+mp.fig4.lg <- melt(mp.fig4, id.vars=c("subject",
                                       "visit",
                                       "men.stat",
                                       "tan.br.dr"))
 
-mp.fig5.lg$visit <- as.integer(unfactor(mp.fig5.lg$visit))
-mp.fig5.lg$value <- as.numeric(unfactor(mp.fig5.lg$value))
+mp.fig4.lg$visit <- as.integer(unfactor(mp.fig4.lg$visit))
+mp.fig4.lg$value <- as.numeric(unfactor(mp.fig4.lg$value))
 
-mp.fig5.lg$tan.br.dr <- factor(mp.fig5.lg$tan.br.dr, levels=c(1,2,3,4,5))
+mp.fig4.lg$tan.br.dr <- factor(mp.fig4.lg$tan.br.dr, levels=c(1,2,3,4,5))
 
-mp.s102 <- subset(mp.fig5.lg, subject==102)
-mp.s103 <- subset(mp.fig5.lg, subject==103)
-mp.s107 <- subset(mp.fig5.lg, subject==107)
-mp.s109 <- subset(mp.fig5.lg, subject==109)
+mp.s102 <- subset(mp.fig4.lg, subject==102)
+mp.s103 <- subset(mp.fig4.lg, subject==103)
+mp.s107 <- subset(mp.fig4.lg, subject==107)
+mp.s109 <- subset(mp.fig4.lg, subject==109)
 
 ## Plot vaginal microbiota composition of subject 102 (w/ legend)
 gg.taxa.bar.102 <- ggplot(mp.s102, aes(x=visit, y=value, fill=variable)) +
@@ -249,12 +252,14 @@ gg.tb.dot.109 <- ggplot(mp.s109, aes(x=visit, y=subject,
         legend.position="none")
 ```
 
-## Figure 5. Transitions to _Lactobacillus_-dominant vaginal microbiota in four perimenarcheal girls.
-Each panel shows the vaginal bacterial community profiles and associated pubertal development of four participants sampled longitudinally. The top bar plot of each panel shows the proportions of bacterial taxa present at each sampling, with colors of taxa indicated in the legend at bottom left. Below each bar plot the menarcheal status (M) and Tanner breast (TB) scores as assessed by a clinician are indicated following the color scheme shown in the legend at bottom right. Empty spaces in the plots indicate a skipped scheduled quarterly visit or a visit in which a vaginal swab or metadata were not collected.
+## Figure 4. Transitions to _Lactobacillus_-dominant vaginal microbiota in four perimenarcheal girls.
+Panels show the vaginal bacterial community profiles and associated pubertal development of four participants sampled longitudinally. Bar plots represent the proportions of bacterial taxa in the community (legend at bottom left). Below each bar plot the menarcheal status and clinician-assessed Tanner stage of breast development are indicated by point shape and color, respectively (legend at bottom right). Empty spaces in the plots indicate a skipped visit.
 
-```{r fig-5-community-dynamics, fig.width=12, fig.height=8}
+**Update 2015-01-08: changed to Figure 4, previously Figure 5.**
+
+```{r fig-4-community-dynamics, fig.width=12, fig.height=8, echo=FALSE}
 ## Uncomment next line to save as a PDF
-# pdf("figures/fig-5-community-dynamics.pdf", width=12, height=8, pointsize=8, bg="transparent")
+# pdf("figures/fig-4-community-dynamics.pdf", width=12, height=8, pointsize=8, bg="transparent")
 grid.arrange(gg.taxa.bar.107 + theme(plot.margin=unit(c(0.25, 1, 0, 0.8), "lines")),
              gg.taxa.bar.109 + theme(plot.margin=unit(c(0.25, 1, 0, 0.8), "lines")),
              gg.tb.dot.107 + theme(plot.margin=unit(c(0.25, 1, 0.5, 2.4), "lines")),
@@ -268,7 +273,7 @@ grid.arrange(gg.taxa.bar.107 + theme(plot.margin=unit(c(0.25, 1, 0, 0.8), "lines
              g_legend(gg.taxa.bar.102),
              g_legend(gg.tb.dot.102),
              ncol=2, heights=c(3,0.75,3,0.75,1.25))
-dev.off()
+# dev.off()
 ```
 
 ***
@@ -288,10 +293,10 @@ unique(meta.vag.gard.10$subject) # n=11
 meta.vag.gard.10.fullobs <- meta.vag[meta.vag$subject %in% meta.vag.gard.10$subject,]
 ```
 
-## Figure S3. Proportion of _Gardnerella_ over time in the vaginal microbiota of girls.
-_Gardnerella_ was present in the vaginal microbiota at a proportion of 0.10 or greater at least once in 11/31 adolescent participants. Each subplot shows the proportion of _Gardnerella_ (encompassing sequence reads assigned to either the species level as _G. vaginalis_ or genus level as _Gardnerella_) in the vaginal microbiota of a single participant at each clinical visit. Open circles represent premenarcheal samples, and filled circles represent postmenarcheal samples. The x-axis indicates the clinical visit at which each sample was collected; visits occurred approximately every three months.
+## Figure S4. Proportion of _Gardnerella_ over time in the vaginal microbiota of girls.
+_Gardnerella_ was present in the vaginal microbiota at a relative abundance of 10% or greater at least once in 11/31 adolescent participants. Each panel shows the proportion of _Gardnerella_ (encompassing sequence reads assigned to either the species level as _G. vaginalis_ or genus level as _Gardnerella_) in the vaginal microbiota of a single participant at each clinical visit. Open circles represent premenarcheal samples, and filled circles represent postmenarcheal samples. The x-axis indicates the clinical visit at which each sample was collected; visits occurred approximately every three months.
 
-```{r fig-s3-gardnerella-vag, fig.width=8, fig.height=4}
+```{r fig-s4-gardnerella-vag, fig.width=8, fig.height=4, echo=FALSE}
 gg.girl.gard <- ggplot(meta.vag.gard.10.fullobs, 
                        aes(x=visit, y=Gardnerella, group=subject, 
                            color=type, shape=men.stat))
@@ -313,7 +318,7 @@ gg.girl.gard + geom_line(lty=3, alpha=0.5) +
         legend.position=c(0.95,0.3))
 
 ## Uncomment next line to save as a PDF
-# ggsave("supplemental/fig-s3-gardnerella-vag.pdf", width=8, height=4, units="in")
+# ggsave("supplemental/fig-s4-gardnerella-vag.pdf", width=8, height=4, units="in")
 ```
 
 ## _Gardnerella_ in vaginal and vulvar microbiota
@@ -337,7 +342,7 @@ meta.girl.gard.10.fullobs <- meta[meta$subject %in% meta.girl.gard.10$subject,]
 ```
 
 Plot vaginal and vulvar samples of girls with at least 10% _Gardnerella_:
-```{r gardnerella-vag-vul, fig.width=8, fig.height=4}
+```{r gardnerella-vag-vul, fig.width=8, fig.height=4, echo=FALSE}
 gg.girl.gard <- ggplot(meta.girl.gard.10.fullobs, 
                        aes(x=visit, y=Gardnerella, group=site, color=site, shape=men.stat))
 gg.girl.gard + geom_line(lty=3, alpha=0.5) +
@@ -369,10 +374,10 @@ cor.sp <- cor(meta[meta$type=="girl" & meta$site=="vag", c("tan.gen.dr","tan.gen
 cor.sp
 ```
 
-## Figure S4. Correlations of Tanner breast and pubic scores according to self and clinician assessment.
-Spearman’s correlation coefficients were calculated to determine how well breast/pubic scores agreed for both clinician- (upper left) and self-assessment (upper right).  Clinician- and self-assessments for Tanner breast (lower left) and Tanner pubic (lower right) scores were also correlated. Correlation coefficients are reported in the header of each plot. Clinician-assessed Tanner breast scores were primarily used for analyses described in the paper.
+## Figure S5. Correlations of Tanner breast and pubic scores according to self and clinician assessment.
+Spearman’s correlation coefficients were calculated to determine how well breast/pubic scores agreed for both clinician- (upper left) and self-assessment (upper right). Physician- and self-assessments for Tanner breast (lower left) and Tanner pubic (lower right) scores were also correlated. Correlation coefficients are reported in the header of each plot. Physician-assessed Tanner breast scores were primarily used for analyses described in the paper.
 
-```{r fig-s4-tanner-correlations, fig.width=10, fig.height=10}
+```{r fig-s5-tanner-correlations, fig.width=10, fig.height=10, echo=FALSE}
 ## Tanner pubic vs. Tanner breast (clinician)
 gg.tan.dr <- ggplot(meta[meta$type=="girl" & meta$site=="vag",], aes(x=tan.br.dr, y=tan.gen.dr)) + 
   geom_jitter(position=position_jitter(width=0.2, height=0.2), color="#8B1C62", size=3, alpha=0.7) +
@@ -406,7 +411,7 @@ gg.tg.dr.self <- ggplot(meta[meta$type=="girl" & meta$site=="vag",], aes(x=tan.g
   theme_cust_nominor
 
 ## Uncomment the next line to save as a PDF
-# pdf("supplemental/fig-s4-tanner-correlations.pdf", width=10, height=10)
+# pdf("supplemental/fig-s5-tanner-correlations.pdf", width=10, height=10)
 multiplot(gg.tan.dr, gg.tan.self, gg.tb.dr.self, gg.tg.dr.self, layout=matrix(c(1,2,3,4), ncol=2, byrow=TRUE))
 dev.off()
 ```
@@ -444,7 +449,7 @@ meta$LAB.logit <- mod.logit(meta$LAB, eps.lab)
 ```
 
 ## Trends in LAB associated with participant metadata
-```{r lab-trends}
+```{r lab-trends, fig.width=6, fig.height=4, echo=FALSE}
 ## Boxplot of LAB.logit ~ Tanner breast
 gg.lab.logit.tb <- ggplot(subset(meta, type=="girl" & site=="vag" & tan.br.dr %in% c(2,3,4,5)), 
                           aes(y=LAB.logit, x=factor(tan.br.dr), fill=factor(tan.br.dr)))
@@ -472,12 +477,25 @@ box.lab.logit.tg <- gg.lab.logit.tg +
 print(box.lab.logit.tg)
 
 ## Boxplot of LAB.logit ~ menarche status
-gg.lab.logit.ms <- ggplot(subset(meta, type=="girl" & site=="vag" & men.stat %in% c("pre","post")), 
+# gg.lab.logit.ms <- ggplot(subset(meta, type=="girl" & site=="vag" & men.stat %in% c("pre","post")), 
+#                           aes(y=LAB.logit, x=men.stat, fill=men.stat))
+# box.lab.logit.ms <- gg.lab.logit.ms + 
+#   geom_boxplot(width=0.5, outlier.shape=1) +
+#   scale_fill_manual(values=col.men.stat[c("pre","post")]) +
+#   scale_x_discrete(limits=c("pre","post")) +
+#   guides(fill=FALSE) +
+#   xlab("Menarche status") +
+#   ylab("Logit-transformed LAB proportion") +
+#   theme_cust
+
+# Update 2015-01-08: added moms to box plots
+gg.lab.logit.ms <- ggplot(subset(meta, site=="vag" & men.stat %in% c("pre","post","mom.post")), 
                           aes(y=LAB.logit, x=men.stat, fill=men.stat))
 box.lab.logit.ms <- gg.lab.logit.ms + 
   geom_boxplot(width=0.5, outlier.shape=1) +
-  scale_fill_manual(values=col.men.stat[c("pre","post")]) +
-  scale_x_discrete(limits=c("pre","post")) +
+  scale_fill_manual(values=c("#8B8B00","#67001F","#EE6363")) +
+  scale_x_discrete(limits=c("pre","post","mom.post"),
+                   labels=c("Girls Pre","Girls Post","Mothers")) +
   guides(fill=FALSE) +
   xlab("Menarche status") +
   ylab("Logit-transformed LAB proportion") +
@@ -511,7 +529,7 @@ print(box.lab.logit.sub)
 ```
 
 ## Trends in vaginal pH associated with participant metadata
-```{r ph-trends}
+```{r ph-trends, fig.width=6, fig.height=4, echo=FALSE}
 ## Boxplot of pH ~ Tanner breast
 gg.ph.tb <- ggplot(subset(meta, type=="girl" & site=="vag" & tan.br.dr %in% c(2,3,4,5)), 
                    aes(y=ph, x=factor(tan.br.dr), fill=factor(tan.br.dr)))
@@ -539,12 +557,25 @@ box.ph.tg <- gg.ph.tg +
 print(box.ph.tg)
 
 ## Boxplot of pH ~ menarche status
-gg.ph.ms <- ggplot(subset(meta, type=="girl" & site=="vag" & men.stat %in% c("pre","post")), 
-                   aes(y=ph, x=men.stat, fill=men.stat))
+# gg.ph.ms <- ggplot(subset(meta, type=="girl" & site=="vag" & men.stat %in% c("pre","post")), 
+#                    aes(y=ph, x=men.stat, fill=men.stat))
+# box.ph.ms <- gg.ph.ms + 
+#   geom_boxplot(width=0.5, outlier.shape=1) +
+#   scale_fill_manual(values=col.men.stat[c(3,2)]) +
+#   scale_x_discrete(limits=c("pre","post")) +
+#   guides(fill=FALSE) +
+#   xlab("Menarche status") +
+#   ylab("Vaginal pH") +
+#   theme_cust
+
+# Update 2015-01-08: added moms to box plots
+gg.ph.ms <- ggplot(subset(meta, site=="vag" & men.stat %in% c("pre","post","mom.post")), 
+                          aes(y=ph, x=men.stat, fill=men.stat))
 box.ph.ms <- gg.ph.ms + 
   geom_boxplot(width=0.5, outlier.shape=1) +
-  scale_fill_manual(values=col.men.stat[c(3,2)]) +
-  scale_x_discrete(limits=c("pre","post")) +
+  scale_fill_manual(values=c("#8B8B00","#67001F","#EE6363")) +
+  scale_x_discrete(limits=c("pre","post","mom.post"),
+                   labels=c("Girls Pre","Girls Post","Mothers")) +
   guides(fill=FALSE) +
   xlab("Menarche status") +
   ylab("Vaginal pH") +
@@ -583,13 +614,15 @@ print(box.ph.sub)
 # dev.off()
 ```
 
-## Figure 6. Trends in relative abundance of lactic acid bacteria and vaginal pH in relation to pubertal development and menarche status.
-198 vaginal swabs were collected from 31 girls over time. Upper and lower panels show box plots of (a) the logit-transformed proportion of lactic acid bacteria (LAB; includes _Lactobacillus_, _Streptococcus_, _Aerococcus_ and _Facklamia_) and (b) vaginal pH. Box plots show the relationship to Tanner breast stage (left column), to Tanner pubic stage (middle) and menarche status (right). In each plot the rectangular box represents the interquartile range, the whiskers represent the upper and lower quartiles, the horizontal line represents the median, and open circles represent outliers.
+## Figure 5. Trends in relative abundance of lactic acid bacteria and vaginal pH in relation to pubertal development and menarche status.
+Upper and lower panels show box plots of (A) the logit-transformed proportion of lactic acid bacteria (LAB; includes _Lactobacillus_, _Streptococcus_, _Aerococcus_ and _Facklamia_) and (B) vaginal pH of 31 perimenarcheal girls. In the left column, box plots show the relationship to Tanner breast stage; in the middle column, Tanner pubic stage; and in the right column, menarche status. In each plot the box represents the interquartile range, the whiskers represent the upper and lower quartiles, the horizontal line represents the median, and open circles represent outliers.
 
-```{r fig-6-lab-ph-trends, fig.width=6, fig.height=8}
+**Update 2015-01-08: added moms to box plots (third column) and change to Figure 5**
+
+```{r fig-5-lab-ph-trends, fig.width=8, fig.height=6, echo=FALSE}
 ## Make compound figure for manuscript with LAB.logit panels on top, pH on bottom
 fig.lab.logit.ph.1 <- box.lab.logit.tb +
-  ggtitle("a") +
+  ggtitle("A") +
   theme(plot.title=element_text(size=22, hjust=-0.15, vjust=1.5))
 fig.lab.logit.ph.2 <- box.lab.logit.tg +
   ggtitle("") +
@@ -600,7 +633,7 @@ fig.lab.logit.ph.3 <- box.lab.logit.ms +
   ylab("") +
   theme(plot.title=element_text(size=22, hjust=-0.15, vjust=1.5))
 fig.lab.logit.ph.4 <- box.ph.tb +
-  ggtitle("b") +
+  ggtitle("B") +
   theme(plot.title=element_text(size=22, hjust=-0.15, vjust=1.5))
 fig.lab.logit.ph.5 <- box.ph.tg +
   ggtitle("") +
@@ -611,12 +644,11 @@ fig.lab.logit.ph.6 <- box.ph.ms +
   ylab("") +
   theme(plot.title=element_text(size=22, hjust=-0.15, vjust=1.5))
 
-# pdf("figures/fig-6-lab-logit-ph-trends.pdf", width=8, height=6)
+# pdf("figures/fig-5-lab-logit-ph-trends.pdf", width=8, height=6)
 multiplot(fig.lab.logit.ph.1, fig.lab.logit.ph.2, fig.lab.logit.ph.3, 
           fig.lab.logit.ph.4, fig.lab.logit.ph.5, fig.lab.logit.ph.6,  
-          layout=matrix(c(1,1,1,2,2,2,3,3,
-                          4,4,4,5,5,5,6,6), ncol=8, byrow=TRUE))
-dev.off()
+          layout=matrix(c(1,2,3,4,5,6), ncol=3, byrow=TRUE))
+# dev.off()
 ```
 
 ## Discordance between high LAB and low pH
@@ -624,9 +656,9 @@ dev.off()
 An interesting observation was that not all samples with high proportions of LAB were associated with a low pH. We hypothesized this could be due to lower total bacterial counts in the vaginas of adolescent girls. We performed a coarse test of that hypothesis but were unable to detect a significant difference in estimated number of 16S rRNA gene copies.
 
 ## Figure S6. Relationship between proportion of lactic acid bacteria and pH in vaginal samples collected from girls.
-197 vaginal microbiota samples from girls are plotted to show the relationship between the proportion of lactic acid bacteria (LAB; includes _Lactobacillus_, _Streptococcus_, _Aerococcus_ and _Facklamia_) on the x-axis and vaginal pH on the y-axis. Menarche status is either premenarcheal (open circles) or postmenarcheal (filled circles). Points are color-coded to indicate Tanner breast stage as indicated by the legend at right (NA values are colored gray). Points are slightly jittered to decrease crowding around similar values, but not so much as to distort interpretation of the data. The magenta dashed line at vaginal pH 4.5 represents the upper range of the traditional ‘hallmark’ healthy vaginal pH of 4.0-4.5.
+197 vaginal microbiota samples from perimenarcheal girls are plotted to show the relationship between the proportion of lactic acid bacteria (LAB; includes _Lactobacillus_, _Streptococcus_, _Aerococcus_ and _Facklamia_) on the x-axis and vaginal pH on the y-axis. Menarche status is either premenarcheal (open circles) or postmenarcheal (filled circles). Points are color-coded to indicate Tanner stage of breast development (clinician-assessed) as indicated by the legend at right (NA values are colored gray). Points are slightly jittered to decrease crowding around similar values. The magenta dashed line at vaginal pH 4.5 represents the upper range of the traditional ‘hallmark’ healthy vaginal pH of 4.0-4.5.
 
-```{r fig-s6-lab-ph, fig.width=8, fig.height=6}
+```{r fig-s6-lab-ph, fig.width=8, fig.height=6, echo=FALSE}
 ## LAB vs. ph
 gg.lab.ph <- ggplot(subset(meta, type=="girl" & site=="vag"), 
                     aes(x=LAB, y=ph, col=factor(tan.br.dr), shape=men.stat))
@@ -649,9 +681,9 @@ This will save the workspace (data) in two separate images: one named with today
 
 ### Cleanup
 ```{r cleanup}
-rm(meta.fig5, meta.girl.gard.10, meta.girl.gard.10.fullobs, meta.vag.gard.10,
-   meta.vag.gard.10.fullobs, mp.fig5, mp.fig5.lg, mp.s102, mp.s103, mp.s107,
-   mp.s109, prop.fig5, prop.fig5.top40, box.lab.logit.ms, box.lab.logit.sub,
+rm(meta.fig4, meta.girl.gard.10, meta.girl.gard.10.fullobs, meta.vag.gard.10,
+   meta.vag.gard.10.fullobs, mp.fig4, mp.fig4.lg, mp.s102, mp.s103, mp.s107,
+   mp.s109, prop.fig4, prop.fig4.top40, box.lab.logit.ms, box.lab.logit.sub,
    box.lab.logit.tb, box.lab.logit.tg, box.ph.ms, box.ph.sub, box.ph.tb, 
    box.ph.tg, dif.lab, eps.lab, fig.lab.logit.ph.1, fig.lab.logit.ph.2,
    fig.lab.logit.ph.3, fig.lab.logit.ph.4, fig.lab.logit.ph.5, fig.lab.logit.ph.6,

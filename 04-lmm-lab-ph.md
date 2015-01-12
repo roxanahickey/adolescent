@@ -1,12 +1,14 @@
 # Linear mixed-effects modeling of trends in lactic acid bacteria proportion and vaginal pH
 Roxana J. Hickey <roxana.hickey@gmail.com>  
-Last updated October 8, 2014  
+Last updated January 12, 2015  
 
 ***
 # Description
-This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. to be submitted in November 2014. The code works through linear mixed effects modeling of trends observed in lactic acid bacteria and vaginal pH of perimenarcheal girls. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd", "02-hclust-pcoa.Rmd" and "03-community-dynamics.Rmd".
+This is a supplement to the paper "Vaginal microbiota of adolescent girls prior to the onset of menarche resemble those of reproductive-age women" by Hickey et al. The code works through linear mixed effects modeling of trends observed in lactic acid bacteria and vaginal pH of perimenarcheal girls. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd", "02-hclust-pcoa.Rmd" and "03-community-dynamics.Rmd".
 
 See the project repository at http://github.com/roxanahickey/adolescent for more information.
+
+**Update 2015-01-08: I added “echo=FALSE” options to the chunks of code that make a graph. View full code in R Markdown script.**
 
 ## Objective
 Previously in our qualitative assessment of vaginal microbiota dynamic trends over time, we saw that lactic acid bacteria (LAB) tended to increase as girls progressed through puberty, while vaginal pH decreased. This analysis attempts to explain and quantify the observed trends in relation to Tanner stage, menarche status, and age.
@@ -41,7 +43,7 @@ library(lmerTest)
 ```
 
 ```
-## Warning: package 'lmerTest' was built under R version 3.1.1
+## Warning: package 'lmerTest' was built under R version 3.1.2
 ```
 
 ```
@@ -75,7 +77,7 @@ sessionInfo()
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] lmerTest_2.0-11 lme4_1.1-7      Rcpp_0.11.2     Matrix_1.1-4   
+## [1] lmerTest_2.0-20 lme4_1.1-7      Rcpp_0.11.2     Matrix_1.1-4   
 ## [5] ggplot2_1.0.0  
 ## 
 ## loaded via a namespace (and not attached):
@@ -87,11 +89,10 @@ sessionInfo()
 ## [16] KernSmooth_2.23-12  knitr_1.6           lattice_0.20-29    
 ## [19] latticeExtra_0.6-26 MASS_7.3-33         minqa_1.2.3        
 ## [22] munsell_0.4.2       nlme_3.1-117        nloptr_1.0.4       
-## [25] numDeriv_2012.9-1   pbkrtest_0.4-0      plyr_1.8.1         
-## [28] proto_0.3-10        RColorBrewer_1.0-5  reshape2_1.4       
-## [31] rmarkdown_0.2.49    scales_0.2.4        splines_3.1.0      
-## [34] stringr_0.6.2       survival_2.37-7     tools_3.1.0        
-## [37] yaml_2.1.13
+## [25] numDeriv_2012.9-1   plyr_1.8.1          proto_0.3-10       
+## [28] RColorBrewer_1.0-5  reshape2_1.4        rmarkdown_0.2.49   
+## [31] scales_0.2.4        splines_3.1.0       stringr_0.6.2      
+## [34] survival_2.37-7     tools_3.1.0         yaml_2.1.13
 ```
 
 ***
@@ -129,111 +130,11 @@ It is a good idea to start out with some basic plots or exploratory data analysi
 ### Plot trends within individuals over time
 View trends in LAB, LAB.logit and pH over time within individuals.
 
-
-```r
-## LAB
-gg.lab <- ggplot(data.lab, aes(x=age.sampling, y=LAB, group=subject, shape=men.stat)) +
-  geom_point(size=3) +
-  facet_wrap( ~ subject, ncol=4) +
-  scale_shape_manual(values=c(1, 16), 
-                     breaks=c("pre", "post"), 
-                     labels=c("Pre", "Post"),
-                     name="Menarche\nStatus", na.value=10) +
-  stat_smooth(method = "loess") +
-  xlab("Age at sampling") +
-  ylab("LAB proportion") +
-  ylim(c(0, 1)) +
-  theme_cust_nominor +
-  theme(axis.text=element_text(size=6))
-
-suppressWarnings(print(gg.lab))
-```
-
-![plot of chunk eda-time-trends](./04-lmm-lab-ph_files/figure-html/eda-time-trends1.png) 
-
-```r
-# ggsave("misc/lab-age-per-subject.pdf", width=10, height=8, units="in")
-
-## LAB.logit
-gg.lablogit <- ggplot(data.lab, aes(x=age.sampling, y=LAB.logit, group=subject, shape=men.stat)) +
-  geom_point(size=3) +
-  facet_wrap( ~ subject, ncol=4) +
-  scale_shape_manual(values=c(1,16), 
-                     breaks=c("pre", "post"), 
-                     labels=c("Pre", "Post"),
-                     name="Menarche\nStatus", na.value=10) +
-  stat_smooth(method = "loess") +
-  xlab("Age at sampling") +
-  ylab("Logit-transformed LAB proportion") +
-  ylim(c(-10, 10)) +
-  theme_cust_nominor +
-  theme(axis.text=element_text(size=6))
-
-suppressWarnings(print(gg.lablogit))
-```
-
-![plot of chunk eda-time-trends](./04-lmm-lab-ph_files/figure-html/eda-time-trends2.png) 
-
-```r
-# ggsave("misc/lab-logit-age-per-subject.pdf", width=10, height=8, units="in")
-
-## pH
-gg.ph <- ggplot(data.ph, aes(x=age.sampling, y=ph, group=subject, shape=men.stat)) +
-  geom_point(size=3) +
-  facet_wrap( ~ subject, ncol=4) +
-  scale_shape_manual(values=c(1,16), 
-                     breaks=c("pre", "post"), 
-                     labels=c("Pre", "Post"),
-                     name="Menarche\nStatus", na.value=10) +
-  stat_smooth(method = "loess") +
-  xlab("Age at sampling") +
-  ylab("Vaginal pH") +
-  ylim(c(4,7.5)) +
-  theme_cust_nominor +
-  theme(axis.text=element_text(size=6))
-
-suppressWarnings(print(gg.ph))
-```
-
-![plot of chunk eda-time-trends](./04-lmm-lab-ph_files/figure-html/eda-time-trends3.png) 
-
-```r
-# ggsave("misc/ph-age-per-subject.pdf", width=10, height=8, units="in")
-```
+![plot of chunk eda-time-trends](./04-lmm-lab-ph_files/figure-html/eda-time-trends1.png) ![plot of chunk eda-time-trends](./04-lmm-lab-ph_files/figure-html/eda-time-trends2.png) ![plot of chunk eda-time-trends](./04-lmm-lab-ph_files/figure-html/eda-time-trends3.png) 
 
 ### Box plots showing relationship with Tanner stage, menarche status
 
-
-```r
-# pdf("misc/boxplots-tanner-menstat.pdf", width=11, height=8.5, pointsize=8)
-par(mfrow=c(2,2), mar=c(4,4,2,2))
-boxplot(LAB.logit ~ tan.br.dr*men.stat, 
-        xlab="Tanner breast * menarche status", 
-        ylab="Logit-transformed LAB proportion",
-        col=c(rep(col.men.stat[3], 5), rep(col.men.stat[2], 5)), 
-        data.lab)
-boxplot(LAB.logit ~ tan.gen.dr*men.stat, 
-        xlab="Tanner pubic * menarche status", 
-        ylab="Logit-transformed LAB proportion",
-        col=c(rep(col.men.stat[3], 5), rep(col.men.stat[2], 5)), 
-        data.lab)
-boxplot(ph ~ tan.br.dr*men.stat, 
-        xlab="Tanner breast * menarche status", 
-        ylab="Vaginal pH",
-        col=c(rep(col.men.stat[3], 5), rep(col.men.stat[2], 5)),
-        data.ph)
-boxplot(ph ~ tan.gen.dr*men.stat, 
-        xlab="Tanner pubic * menarche status", 
-        ylab="Vaginal pH",
-        col=c(rep(col.men.stat[3], 5), rep(col.men.stat[2], 5)),
-        data.ph)
-```
-
 ![plot of chunk eda-boxplots](./04-lmm-lab-ph_files/figure-html/eda-boxplots.png) 
-
-```r
-dev.off()
-```
 
 ```
 ## null device 
@@ -246,7 +147,6 @@ From these plots we probably expect to see a positive trend in LAB.logit and dec
 
 
 ```r
-# come back to this
 (fit1a <- lmer(LAB.logit ~ factor(tan.br.dr) + (1|subject), data=na.omit(data.lab), contrasts=list(`factor(tan.br.dr)`=MASS::contr.sdif)))
 ```
 
@@ -442,7 +342,8 @@ summary(lab.fit1)
 ```
 
 ```
-## Linear mixed model fit by REML ['merModLmerTest']
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [merModLmerTest]
 ## Formula: LAB.logit ~ factor(tan.br.dr) + (1 | subject)
 ##    Data: data.lab
 ## 
@@ -462,7 +363,7 @@ summary(lab.fit1)
 ##                      Estimate Std. Error      df t value Pr(>|t|)    
 ## (Intercept)             2.866      0.469  28.600    6.11  1.2e-06 ***
 ## factor(tan.br.dr)2-1    3.746      0.691 184.500    5.42  1.9e-07 ***
-## factor(tan.br.dr)3-2   -0.180      0.504 166.500   -0.36     0.72    
+## factor(tan.br.dr)3-2   -0.180      0.504 166.600   -0.36     0.72    
 ## factor(tan.br.dr)4-3    0.927      0.687 172.300    1.35     0.18    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
@@ -563,7 +464,8 @@ summary(lab.fit3)
 ```
 
 ```
-## Linear mixed model fit by REML ['merModLmerTest']
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [merModLmerTest]
 ## Formula: LAB.logit ~ factor(tan.br.dr) + age.sampling + (1 | subject)
 ##    Data: data.lab
 ## 
@@ -649,7 +551,8 @@ summary(lab.fit4)
 ```
 
 ```
-## Linear mixed model fit by REML ['merModLmerTest']
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [merModLmerTest]
 ## Formula: LAB.logit ~ factor(tan.br.dr) * age.sampling + (1 | subject)
 ##    Data: data.lab
 ## 
@@ -825,7 +728,8 @@ summary(lab.fit6)
 ```
 
 ```
-## Linear mixed model fit by REML ['merModLmerTest']
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [merModLmerTest]
 ## Formula: LAB.logit ~ tan.br.dr + age.sampling + (1 + tan.br.dr | subject)
 ##    Data: data.lab
 ## 
@@ -929,7 +833,8 @@ summary(lab.fit7)
 ```
 
 ```
-## Linear mixed model fit by REML ['merModLmerTest']
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [merModLmerTest]
 ## Formula: 
 ## LAB.logit ~ tan.br.dr + age.sampling + (1 + age.sampling | subject)
 ##    Data: data.lab
@@ -949,11 +854,11 @@ summary(lab.fit7)
 ## 
 ## Fixed effects:
 ##              Estimate Std. Error      df t value Pr(>|t|)   
-## (Intercept)    -6.348      5.176   8.900   -1.23   0.2516   
-## tan.br.dr.L     1.946      0.771 180.500    2.52   0.0125 * 
-## tan.br.dr.Q    -1.367      0.485 149.300   -2.82   0.0055 **
-## tan.br.dr.C     1.168      0.384 159.100    3.04   0.0028 **
-## age.sampling    0.779      0.439   7.800    1.77   0.1148   
+## (Intercept)    -6.348      5.176   8.800   -1.23   0.2517   
+## tan.br.dr.L     1.946      0.771 180.400    2.52   0.0125 * 
+## tan.br.dr.Q    -1.367      0.485 149.200   -2.82   0.0055 **
+## tan.br.dr.C     1.168      0.384 159.300    3.04   0.0028 **
+## age.sampling    0.779      0.439   7.800    1.77   0.1149   
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -1039,7 +944,8 @@ summary(ph.fit1)
 ```
 
 ```
-## Linear mixed model fit by REML ['merModLmerTest']
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [merModLmerTest]
 ## Formula: ph ~ factor(tan.br.dr) + (1 | subject)
 ##    Data: data.ph
 ## 
@@ -1119,7 +1025,8 @@ summary(ph.fit2)
 ```
 
 ```
-## Linear mixed model fit by REML ['merModLmerTest']
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [merModLmerTest]
 ## Formula: ph ~ factor(tan.br.dr) + men.stat + (1 | subject)
 ##    Data: data.ph
 ## 
@@ -1201,7 +1108,8 @@ summary(ph.fit3)
 ```
 
 ```
-## Linear mixed model fit by REML ['merModLmerTest']
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [merModLmerTest]
 ## Formula: ph ~ factor(tan.br.dr) + men.stat + age.sampling + (1 | subject)
 ##    Data: data.ph
 ## 
@@ -1684,7 +1592,8 @@ summary(lab.fit1)
 ```
 
 ```
-## Linear mixed model fit by REML ['merModLmerTest']
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [merModLmerTest]
 ## Formula: LAB.logit ~ factor(tan.gen.dr) + (1 | subject)
 ##    Data: data.lab
 ## 
@@ -1706,7 +1615,7 @@ summary(lab.fit1)
 ## factor(tan.gen.dr)2-1   0.9297     3.1869 176.9000    0.29  0.77083    
 ## factor(tan.gen.dr)3-2   2.6476     0.6997 177.1000    3.78  0.00021 ***
 ## factor(tan.gen.dr)4-3   0.8295     0.5409 162.4000    1.53  0.12707    
-## factor(tan.gen.dr)5-4   0.0856     0.7878 166.8000    0.11  0.91363    
+## factor(tan.gen.dr)5-4   0.0856     0.7878 166.9000    0.11  0.91363    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -1807,7 +1716,8 @@ summary(lab.fit3)
 ```
 
 ```
-## Linear mixed model fit by REML ['merModLmerTest']
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [merModLmerTest]
 ## Formula: LAB.logit ~ factor(tan.gen.dr) + age.sampling + (1 | subject)
 ##    Data: data.lab
 ## 
@@ -1903,10 +1813,12 @@ summary(lab.fit4)
 ```
 ## fixed-effect model matrix is rank deficient so dropping 1 column / coefficient
 ## fixed-effect model matrix is rank deficient so dropping 1 column / coefficient
+## fixed-effect model matrix is rank deficient so dropping 1 column / coefficient
 ```
 
 ```
-## Linear mixed model fit by REML ['merModLmerTest']
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [merModLmerTest]
 ## Formula: LAB.logit ~ factor(tan.gen.dr) * age.sampling + (1 | subject)
 ##    Data: data.lab
 ## 
@@ -2083,7 +1995,8 @@ summary(ph.fit1)
 ```
 
 ```
-## Linear mixed model fit by REML ['merModLmerTest']
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [merModLmerTest]
 ## Formula: ph ~ factor(tan.gen.dr) + (1 | subject)
 ##    Data: data.ph
 ## 
@@ -2163,7 +2076,8 @@ summary(ph.fit2)
 ```
 
 ```
-## Linear mixed model fit by REML ['merModLmerTest']
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [merModLmerTest]
 ## Formula: ph ~ factor(tan.gen.dr) + men.stat + (1 | subject)
 ##    Data: data.ph
 ## 
@@ -2185,7 +2099,7 @@ summary(ph.fit2)
 ## factor(tan.gen.dr)2-1  -1.0335     0.2373 102.6000   -4.36  3.2e-05 ***
 ## factor(tan.gen.dr)3-2  -0.1444     0.1514  97.4000   -0.95    0.343    
 ## factor(tan.gen.dr)4-3  -0.0416     0.1956  98.2000   -0.21    0.832    
-## men.statpost           -0.3773     0.1667 104.8000   -2.26    0.026 *  
+## men.statpost           -0.3773     0.1667 104.9000   -2.26    0.026 *  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -2245,7 +2159,8 @@ summary(ph.fit3)
 ```
 
 ```
-## Linear mixed model fit by REML ['merModLmerTest']
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [merModLmerTest]
 ## Formula: ph ~ factor(tan.gen.dr) + men.stat + age.sampling + (1 | subject)
 ##    Data: data.ph
 ## 
@@ -2265,9 +2180,9 @@ summary(ph.fit3)
 ##                       Estimate Std. Error       df t value Pr(>|t|)    
 ## (Intercept)             9.6123     1.4966 107.8000    6.42  3.7e-09 ***
 ## factor(tan.gen.dr)2-1  -0.8496     0.2400 104.3000   -3.54   0.0006 ***
-## factor(tan.gen.dr)3-2   0.0383     0.1615  99.3000    0.24   0.8130    
+## factor(tan.gen.dr)3-2   0.0383     0.1615  99.4000    0.24   0.8130    
 ## factor(tan.gen.dr)4-3   0.1323     0.2003 101.8000    0.66   0.5102    
-## men.statpost           -0.1293     0.1850 109.9000   -0.70   0.4860    
+## men.statpost           -0.1293     0.1850 110.0000   -0.70   0.4860    
 ## age.sampling           -0.3535     0.1274 108.5000   -2.78   0.0065 ** 
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1

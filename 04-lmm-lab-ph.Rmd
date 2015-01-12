@@ -2,7 +2,7 @@
 title: "Linear mixed-effects modeling of trends in lactic acid bacteria proportion
   and vaginal pH"
 author: "Roxana J. Hickey <roxana.hickey@gmail.com>"
-date: "Last updated October 8, 2014"
+date: "Last updated January 12, 2015"
 output:
   html_document:
     keep_md: yes
@@ -13,9 +13,11 @@ output:
 
 ***
 # Description
-This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. to be submitted in November 2014. The code works through linear mixed effects modeling of trends observed in lactic acid bacteria and vaginal pH of perimenarcheal girls. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd", "02-hclust-pcoa.Rmd" and "03-community-dynamics.Rmd".
+This is a supplement to the paper "Vaginal microbiota of adolescent girls prior to the onset of menarche resemble those of reproductive-age women" by Hickey et al. The code works through linear mixed effects modeling of trends observed in lactic acid bacteria and vaginal pH of perimenarcheal girls. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd", "02-hclust-pcoa.Rmd" and "03-community-dynamics.Rmd".
 
 See the project repository at http://github.com/roxanahickey/adolescent for more information.
+
+**Update 2015-01-08: I added “echo=FALSE” options to the chunks of code that make a graph. View full code in R Markdown script.**
 
 ## Objective
 Previously in our qualitative assessment of vaginal microbiota dynamic trends over time, we saw that lactic acid bacteria (LAB) tended to increase as girls progressed through puberty, while vaginal pH decreased. This analysis attempts to explain and quantify the observed trends in relation to Tanner stage, menarche status, and age.
@@ -73,7 +75,7 @@ It is a good idea to start out with some basic plots or exploratory data analysi
 ### Plot trends within individuals over time
 View trends in LAB, LAB.logit and pH over time within individuals.
 
-```{r eda-time-trends}
+```{r eda-time-trends, fig.width=8, fig.height=6, echo=FALSE}
 ## LAB
 gg.lab <- ggplot(data.lab, aes(x=age.sampling, y=LAB, group=subject, shape=men.stat)) +
   geom_point(size=3) +
@@ -134,7 +136,7 @@ suppressWarnings(print(gg.ph))
 
 ### Box plots showing relationship with Tanner stage, menarche status
 
-```{r eda-boxplots}
+```{r eda-boxplots, fig.width=8, fig.height=6, echo=FALSE}
 # pdf("misc/boxplots-tanner-menstat.pdf", width=11, height=8.5, pointsize=8)
 par(mfrow=c(2,2), mar=c(4,4,2,2))
 boxplot(LAB.logit ~ tan.br.dr*men.stat, 
@@ -165,7 +167,6 @@ From these plots we probably expect to see a positive trend in LAB.logit and dec
 ### Test whether using Tanner breast or pubic scores makes a difference
 
 ```{r compare-tanner}
-# come back to this
 (fit1a <- lmer(LAB.logit ~ factor(tan.br.dr) + (1|subject), data=na.omit(data.lab), contrasts=list(`factor(tan.br.dr)`=MASS::contr.sdif)))
 (fit1b <- lmer(LAB.logit ~ factor(tan.gen.dr) + (1|subject), data=na.omit(data.lab), contrasts=list(`factor(tan.gen.dr)`=MASS::contr.sdif)))
 anova(fit1b, fit1a)

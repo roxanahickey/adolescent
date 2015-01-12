@@ -1,12 +1,14 @@
 # Comparisons of girls' vaginal and vulvar microbiota
 Roxana J. Hickey <roxana.hickey@gmail.com>  
-Last updated October 8, 2014  
+Last updated January 12, 2015  
 
 ***
 # Description
-This is a supplement to the paper "Vaginal microbiota of adolescent girls resemble those of reproductive-age women prior to the onset of menarche" by Hickey et al. to be submitted in November 2014. The code works through comparisons of vaginal and vulvar microbiota of perimenarcheal girls. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd".
+This is a supplement to the paper "Vaginal microbiota of adolescent girls prior to the onset of menarche resemble those of reproductive-age women" by Hickey et al. The code works through comparisons of vaginal and vulvar microbiota of perimenarcheal girls. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd".
 
 See the project repository at http://github.com/roxanahickey/adolescent for more information.
+
+**Update 2015-01-08: I added “echo=FALSE” options to the chunks of code that make a graph. View full code in R Markdown script.**
 
 ## Objective
 In earlier analyses ("02-hclust-pcoa.Rmd", "03-community-dynamics.Rmd", "04-lmm-lab-ph.Rmd") we focused on vaginal microbiota; now we want to extend our analyses to compare vulvar microbiota alongside vaginal microbiota. Here we perform hierarchical clustering and PCoA with both vaginal and vulvar data (similar to in "02-hclust-pcoa.Rmd") in addition to correlation analysis (part III) and indicator species analysis (part IV).
@@ -98,8 +100,8 @@ sessionInfo()
 ***
 # I. Hierarchical clustering of vaginal and vulvar microbiota
 The first set of analyses involves clustering vaginal and vulvar samples based on bacterial community composition and selecting the optimal clustering model and number of clusters. The approaches are based on those outlined in the following texts:  
-* Legendre P, Legendre L. (2012). Cluster analysis. 3rd ed. Elsevier.
-* Borcard D, Gillet F, Legendre P. (2011). Numerical ecology with R. Springer.
+* Legendre P, Legendre L. (2012). _Cluster analysis._ 3rd ed. Elsevier.
+* Borcard D, Gillet F, Legendre P. (2011). _Numerical ecology with R._ Springer.
 
 ## Hellinger standardization of taxon abundance data
 First, we standardize our bacterial read abundances using the Hellinger method. This is a recommended approach when the "species" are sparsely populated at some sites, resulting in many zeros in the species abundance matrix. We then compute the Bray-Curtis dissimilarity matrix from the Hellinger standardized abundance matrix. This will be used in subsequent clustering and ordination analyses.
@@ -120,28 +122,7 @@ spe.hel.bc <- vegdist(spe.hel, method="bray")
 ## Hierarchical clustering
 Now we will perform hierarchical clustering using multiple linkage strategies (single, complete, average/UPGMA, Ward) and select the optimal one using Gower's distance. Then we'll select the optimal number of clusters using the maximum silhouette width.
 
-
-```r
-## Compute hierarchical clustering using four linkage methods
-spe.hb.single <- hclust(spe.hel.bc, method="single")
-spe.hb.complete <- hclust(spe.hel.bc, method="complete")
-spe.hb.upgma <- hclust(spe.hel.bc, method="average")
-spe.hb.ward <- hclust(spe.hel.bc, method="ward.D")
-
-## Plot to compare (these are ugly because the labels obscure each another, 
-## but it's useful to take a look at the shape of the dendrograms)
-par(mfrow=c(2,2))
-plot(spe.hb.single, main="Single Linkage, Hellinger/Bray")
-plot(spe.hb.complete, main="Complete Linkage, Hellinger/Bray")
-plot(spe.hb.upgma, main="UPGMA, Hellinger/Bray")
-plot(spe.hb.ward, main="Ward, Hellinger/Bray")
-```
-
 ![plot of chunk hclust-comparison](./05-vagina-vulva-comparison_files/figure-html/hclust-comparison.png) 
-
-```r
-dev.off()
-```
 
 ```
 ## null device 
@@ -188,56 +169,14 @@ gow.dist.single; gow.dist.complete; gow.dist.upgma; gow.dist.ward # Lowest score
 ## Selection of optimal number of clusters
 Now we pick the optimal number of clusters according silhouette widths (Rousseew quality index). To do this we plot the average silhouette widths for all partitions except for the trivial partition in a single group (k=1). We find that six clusters are identified as optimal.
 
-
-```r
-## First, create an empty vector in which the asw values will be written
-asw <- numeric(nrow(spe.abund))
-
-## This function calculates and plots the silhouette width, indicating the optimal number in red (from Borcard et al. 2011)
-for (k in 2:(nrow(spe.abund)-1)) {
-  sil <- silhouette(cutree(spe.hb.upgma, k=k), spe.hel.bc)
-  asw[k] <- summary(sil)$avg.width
-}
-k.best <- which.max(asw)
-plot(1:nrow(spe.abund), asw, type="h", 
-     main="Silhouette-optimal number of clusters, UPGMA",
-     xlab="k (number of groups)", ylab="Average silhouette width")
-axis(1, k.best, paste("optimum",k.best,sep="\n"), col="red", font=2, col.axis="red")
-points(k.best, max(asw), pch=16, col="red", cex=1.5)
-```
-
 ![plot of chunk hclust-silhouette](./05-vagina-vulva-comparison_files/figure-html/hclust-silhouette1.png) 
-
-```r
-cat("", "Silhouette-optimal number of clusters k =", k.best, "\n", 
-    "with an average silhouette width of", max(asw), "\n")
-```
 
 ```
 ##  Silhouette-optimal number of clusters k = 7 
 ##  with an average silhouette width of 0.3691
 ```
 
-```r
-## Now we can look at how well the number of clusters matches the clustering of our samples:
-## Set the number of clusters identified as optimal
-k <- 7
-
-## Cut the tree and assign samples to each of the six groups
-cutg <- cutree(spe.hb.upgma, k=k)
-sil <- silhouette(cutg, spe.hel.bc)
-rownames(sil) <- row.names(spe.abund)
-
-## Plot silhouette partition
-plot(sil, main="Silhouette plot - Hellinger - UPGMA", cex.names=0.8, col=2:(k+1), nmax=100)
-```
-
 ![plot of chunk hclust-silhouette](./05-vagina-vulva-comparison_files/figure-html/hclust-silhouette2.png) 
-
-```r
-## Plot dendrogram with group labels
-hcoplot(spe.hb.upgma, spe.hel.bc, k=6)
-```
 
 ```
 ## Loading required package: gclus
@@ -295,37 +234,9 @@ dev.off()
 
 Now we visualize community composition as a heatmap along with the UPGMA dendrogram and cluster assignments just determined:
 
-## Figure S7. Heatmap of the proportions of bacterial taxa in the vulvar and vaginal microbiota of girls and vaginal microbiota of mothers sampled longitudinally.
+## Figure S8. Bacterial community composition of the vulvar and vaginal microbiota of girls and vaginal microbiota of mothers sampled longitudinally.
+Each column in the dendrogram and heatmap represents the vulvar or vaginal microbiota sampled from a single individual at a single point in time. In total 456 samples are represented: 198 vaginal samples and 211 vulvar samples from 31 girls, and 47 vaginal samples from 24 mothers. e dendrogram represents the average linkage (UPGMA) hierarchical clustering of samples based on the Bray-Curtis dissimilarity matrix computed from Hellinger standardized taxon abundance data. The colored bars below the dendrogram represent sample type (girl/mother, vagina/vulva) and hierarchical cluster assignments. Clusters are named to signify the most abundant taxon, when applicable: LC (_Lactobacillus crispatus_ dominant, n=134), ‘Other’ (n=117), LI (_L. iners_, n=107), LG (_L. gasseri_, n=49), GV (_Gardnerella vaginalis_, n=47), and ‘Bifido’ (_Bifidobacterium_, n=3). e heatmap represents proportions (prior to Hellinger standardization) of the 25 overall most abundant taxa within each community as indicated by the legend at top right.
 
-```r
-## Sort taxa by abundance (row-wise, by taxon)
-rsum <- rowSums(prop.red)
-
-## Pick the top 25 taxa across all samples for the heatmap
-pick <- order(rsum,decreasing=TRUE)[1:25]
-
-## Plot the dendrogram and heatmap with selected metadata (uncomment the first line below to save as a PDF)
-# pdf("supplemental/fig-s7-hclust-heatmap-hellinger-bray-upgma.pdf", width=12, height=8, pointsize=10)
-fcol <- cbind(col.hclust[cutg], col.meta$site, col.meta$type)
-colnames(fcol) <- c("Group", "Site", "Girl/Mom")
-par(oma=c(2,2,2,2), lwd=0.75)
-heatmap.3(prop.red[pick,],
-          col=col.heatmap,
-          distfun=vegdist, 
-          hclustfun=function (z) hclust(spe.hel.bc, method="average"),
-          labCol="",
-          ColSideColors=fcol,
-          cexRow=1,
-          cexCol=0.5,
-          mar=c(5,5),
-          dendrogram="column",
-          Rowv=F,
-          Colv=T,
-          keysize=1,
-          trace="none",
-          key=T,
-          density.info="none",family="sans")
-```
 
 ```
 ## Loading required package: gplots
@@ -346,21 +257,7 @@ heatmap.3(prop.red[pick,],
 ##     lowess
 ```
 
-```r
-par(oma=c(1,2,1,2), new=TRUE, xpd=TRUE)
-plot(0:1, 0:1, type = "n", axes = F, xlab="", ylab="")
-legend(0.15, -0.085, legend=sort(names(col.hclust)), title="Cluster", 
-       fill=col.hclust[order(names(col.hclust))], bty="n", 
-       bg="#ffffff55", inset=0, cex=0.8, ncol=3)
-legend(0.4, -0.085, legend=c("Girl", "Mom", "Vagina", "Vulva"), title="Sample Type", 
-       fill=c(col.type, col.site), bty="n", bg="#ffffff55", inset=0, cex=0.8, ncol=2)
-```
-
-![plot of chunk fig-s7-hclust-heatmap-hellinger-bray-upgma](./05-vagina-vulva-comparison_files/figure-html/fig-s7-hclust-heatmap-hellinger-bray-upgma.png) 
-
-```r
-dev.off()
-```
+![plot of chunk fig-s8-hclust-heatmap-hellinger-bray-upgma](./05-vagina-vulva-comparison_files/figure-html/fig-s8-hclust-heatmap-hellinger-bray-upgma.png) 
 
 ```
 ## null device 
@@ -370,8 +267,8 @@ dev.off()
 ***
 # II. PCoA of vaginal and vulvar microbiota
 Now we perform PCoA to obtain a more nuanced picture of the similarities and differences among samples. Again, the approaches are based on those outlined in the following texts:  
-* Legendre P, Legendre L. (2012). *Cluster analysis*. 3rd ed. Elsevier.
-* Borcard D, Gillet F, Legendre P. (2011). *Numerical ecology with R*. Springer.
+* Legendre P, Legendre L. (2012). _Cluster analysis_. 3rd ed. Elsevier.
+* Borcard D, Gillet F, Legendre P. (2011). _Numerical ecology with R_. Springer.
 
 ## Setup PCoA
 *Note: the PCoA method below produces negative eigenvalues unless corrected, which can be problematic for interpreting the R^2\-like ratio (essentially variance explained by an eigenvalue in PCA). See Legendre & Legendre Numerical Ecology Ch 9 for more discussion of this (p. 505 in 3rd edition 2012). However, as long as the largest-value negative eigenvalue is smaller in absolute value than any of the positive eigenvalues of interest (typically the first two), the interpretation is still meaningful. A correction was suggested by Cailliez & Pagès to adjust the R^2\-like ratio when negative eigenvalues are present -- see Legendre & Legendre p. 506, eq. 9.48.*
@@ -444,82 +341,17 @@ Now we can plot the PCoA and overlay different variables with point shapes and c
 * Color-coding by body site
 
 
-```r
-## Make semi-transparent colors for plotting 3D scatterplot
-col.hclust.alpha70 <- makeTransparent(col.hclust[meta$hclust], alpha=0.70)
-col.site.alpha70 <- makeTransparent(col.site[meta$site], alpha=0.70)
-col.type.alpha70 <- makeTransparent(col.type[meta$type], alpha=0.70)
-
-## Plot the first two axes of the PCoA
-# pdf("misc/pcoa-girl-vag-vul-hclust.pdf", width=6, height=6, pointsize=10)
-ordiplot(scores(spe.hb.pcoa)[,c(1,2)], type="n", xlab="Axis 1", ylab="Axis 2")
 ```
+## Warning: Species scores not available
+```
+
+![plot of chunk pcoa-vag-vul-hclust](./05-vagina-vulva-comparison_files/figure-html/pcoa-vag-vul-hclust1.png) 
 
 ```
 ## Warning: Species scores not available
 ```
 
-```r
-abline(h=0, lty=3, col="gray70")
-abline(v=0, lty=3, col="gray70")
-points(scores(spe.hb.pcoa), 
-       col=col.hclust.alpha70, 
-       pch=col.meta$pch.sample.gp,
-       cex=1.3)
-legend("topright", bty="n", title="Sample Type",
-       legend=c("girl vag pre", "girl vag post", "girl vag NA", 
-                "girl vul pre", "girl vul post", "girl vul NA", 
-                "mom vag"), 
-       pch=c(1,16,10,0,15,12,17))
-legend("bottomright", bty="n", bg="white", legend=sort(names(col.hclust)), 
-       title="Cluster", fill=col.hclust[order(names(col.hclust))])
-```
-
-![plot of chunk pcoa-vag-vul-hclust](./05-vagina-vulva-comparison_files/figure-html/pcoa-vag-vul-hclust.png) 
-
-```r
-dev.off()
-```
-
-```
-## null device 
-##           1
-```
-
-```r
-## Colored by body site
-# pdf("misc/pcoa-girl-vag-vul-site.pdf", width=6, height=6, pointsize=10)
-ordiplot(scores(spe.hb.pcoa)[,c(1,2)], type="n", xlab="Axis 1", ylab="Axis 2")
-```
-
-```
-## Warning: Species scores not available
-```
-
-```r
-abline(h=0, lty=3, col="gray70")
-abline(v=0, lty=3, col="gray70")
-points(scores(spe.hb.pcoa)[meta$type=="mom",c(1,2)], 
-       col=col.type.alpha70[meta$type=="mom"], 
-       pch=col.meta$pch.sample.gp[meta$type=="mom"],
-       cex=1.3)
-points(scores(spe.hb.pcoa)[meta$type=="girl",c(1,2)], 
-       col=col.site.alpha70[meta$type=="girl"], 
-       pch=col.meta$pch.sample.gp[meta$type=="girl"],
-       cex=1.3)
-legend("topright", bty="n", title="Sample Type",
-       legend=c("girl vag pre", "girl vag post", "girl vag NA", 
-                "girl vul pre", "girl vul post", "girl vul NA", 
-                "mom vag"), 
-       pch=c(1,16,10,0,15,12,17), col=c(rep("black", 6), col.type[2]))
-legend("bottomright", bty="n", legend=c("vag", "vul"), title="Site", fill=col.site[c("vag","vul")])
-dev.off()
-```
-
-```
-## null device 
-##           1
-```
+![plot of chunk pcoa-vag-vul-hclust](./05-vagina-vulva-comparison_files/figure-html/pcoa-vag-vul-hclust2.png) 
 
 ***
 # III. Correlation of paired vaginal and vulvar samples
@@ -603,7 +435,7 @@ cor.vag.vul.hel.pe.pr <- diag(cor.vag.vul.hel.pe)
 hist(cor.vag.vul.hel.pe.pr, breaks=30)
 ```
 
-![plot of chunk vag-vul-pearson](./05-vagina-vulva-comparison_files/figure-html/vag-vul-pearson1.png) 
+![plot of chunk vag-vul-pearson-setup](./05-vagina-vulva-comparison_files/figure-html/vag-vul-pearson-setup.png) 
 
 ```r
 mean(cor.vag.vul.hel.pe.pr)
@@ -623,25 +455,24 @@ median(cor.vag.vul.hel.pe.pr)
 
 ```r
 meta.paired$cor.pearson.hellinger <- cor.vag.vul.hel.pe.pr
-
-gg.cor.vag.vul.pe <- ggplot(meta.paired, aes(x=visit, y=cor.pearson.hellinger, shape=men.stat))
-
-gg.cor.vag.vul.pe + geom_point(size=3) + 
-  geom_line(lty=3) +
-  facet_wrap( ~ subject, ncol=4) +
-  scale_shape_manual(values=c(16, 1), 
-                     breaks=c("pre", "post"), 
-                     labels=c("Pre", "Post"),
-                     name="Menarche\nStatus", na.value=10) +
-  xlab("Visit") +
-  ylab("Pearson correlation of vagina vs. vulva") +
-  scale_x_discrete(1:14, name="Visit No.") +
-  ylim(0,1) +
-  theme_cust_nominor +
-  theme(axis.text=element_text(size=6),
-        legend.position=c(1,0),
-        legend.justification=c(1,0))
 ```
+
+
+```
+## Warning: Removed 1 rows containing missing values (geom_point).
+```
+
+```
+## geom_path: Each group consist of only one observation. Do you need to adjust the group aesthetic?
+## geom_path: Each group consist of only one observation. Do you need to adjust the group aesthetic?
+## geom_path: Each group consist of only one observation. Do you need to adjust the group aesthetic?
+```
+
+```
+## Warning: Removed 1 rows containing missing values (geom_path).
+```
+
+![plot of chunk vag-vul-pearson](./05-vagina-vulva-comparison_files/figure-html/vag-vul-pearson1.png) 
 
 ```
 ## Warning: Removed 1 rows containing missing values (geom_point).
@@ -658,45 +489,6 @@ gg.cor.vag.vul.pe + geom_point(size=3) +
 ```
 
 ![plot of chunk vag-vul-pearson](./05-vagina-vulva-comparison_files/figure-html/vag-vul-pearson2.png) 
-
-```r
-## Plot together
-cor.meta.pr <- meta.paired[,c("subject", "visit", "men.stat",
-                              "cor.spearman", "cor.pearson.hellinger")]
-cor.meta.pr <- melt(cor.meta.pr, id.vars=c("subject", "visit", "men.stat"))
-
-gg.cor.vag.vul <- ggplot(cor.meta.pr, aes(x=visit, y=value, shape=men.stat, color=variable))
-
-gg.cor.vag.vul + geom_point(size=3) + 
-  geom_line(lty=3) +
-  facet_wrap( ~ subject, ncol=4) +
-  scale_shape_manual(values=c(16, 1), 
-                     breaks=c("pre", "post"), 
-                     labels=c("Pre", "Post"),
-                     name="Menarche\nStatus", na.value=10) +
-  xlab("Visit") +
-  ylab("Correlation of vagina vs. vulva") +
-  scale_x_discrete(1:14, name="Visit No.") +
-  ylim(0,1) +
-  theme_cust_nominor +
-  theme(axis.text=element_text(size=6))
-```
-
-```
-## Warning: Removed 1 rows containing missing values (geom_point).
-```
-
-```
-## geom_path: Each group consist of only one observation. Do you need to adjust the group aesthetic?
-## geom_path: Each group consist of only one observation. Do you need to adjust the group aesthetic?
-## geom_path: Each group consist of only one observation. Do you need to adjust the group aesthetic?
-```
-
-```
-## Warning: Removed 1 rows containing missing values (geom_path).
-```
-
-![plot of chunk vag-vul-pearson](./05-vagina-vulva-comparison_files/figure-html/vag-vul-pearson3.png) 
 
 ***
 # IV. Indicator 'species' (taxa) analysis of vaginal vs. vulvar samples
@@ -734,9 +526,9 @@ summary(ind.girl.sampletype, alpha=0.01) # list all results with p<=0.01
 ##  Significance level (alpha): 0.01
 ## 
 ##  Total number of species: 79
-##  Selected number of species: 35 
+##  Selected number of species: 34 
 ##  Number of species associated to 1 group: 0 
-##  Number of species associated to 2 groups: 13 
+##  Number of species associated to 2 groups: 12 
 ##  Number of species associated to 3 groups: 22 
 ## 
 ##  List of species associated to each combination: 
@@ -754,14 +546,13 @@ summary(ind.girl.sampletype, alpha=0.01) # list all results with p<=0.01
 ## Lachnospiracea_incertae_sedis 0.412   0.010 **
 ## Actinobaculum                 0.331   0.005 **
 ## 
-##  Group girl.vul.post+girl.vul.pre  #sps.  6 
+##  Group girl.vul.post+girl.vul.pre  #sps.  5 
 ##                     stat p.value   
 ## Segniliparus       0.609   0.005 **
 ## Murdochiella       0.590   0.005 **
 ## Fusobacterium      0.577   0.005 **
-## Jonquetella        0.488   0.010 **
 ## Olsenella          0.412   0.005 **
-## Peptostreptococcus 0.350   0.010 **
+## Peptostreptococcus 0.350   0.005 **
 ## 
 ##  Group girl.vag.post+girl.vul.post+girl.vul.pre  #sps.  4 
 ##                  stat p.value   
@@ -787,9 +578,9 @@ summary(ind.girl.sampletype, alpha=0.01) # list all results with p<=0.01
 ## Streptococcus_Other             0.567   0.005 **
 ## Varibaculum                     0.562   0.005 **
 ## Peptococcus                     0.540   0.005 **
-## Porphyromonadaceae              0.529   0.005 **
+## Porphyromonadaceae              0.529   0.010 **
 ## Anaerovorax                     0.503   0.005 **
-## Actinomyces                     0.471   0.005 **
+## Actinomyces                     0.471   0.010 **
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -834,9 +625,9 @@ summary(ind.hbaclust.single, alpha=0.01) # list all results with p<=0.01
 ##  Significance level (alpha): 0.01
 ## 
 ##  Total number of species: 79
-##  Selected number of species: 25 
-##  Number of species associated to 1 group: 12 
-##  Number of species associated to 2 groups: 2 
+##  Selected number of species: 30 
+##  Number of species associated to 1 group: 14 
+##  Number of species associated to 2 groups: 5 
 ##  Number of species associated to 3 groups: 7 
 ##  Number of species associated to 4 groups: 3 
 ##  Number of species associated to 5 groups: 0 
@@ -849,10 +640,13 @@ summary(ind.hbaclust.single, alpha=0.01) # list all results with p<=0.01
 ## Bifidobacterium 0.982   0.005 **
 ## Aerococcus      0.967   0.005 **
 ## 
-##  Group GV  #sps.  2 
+##  Group GV  #sps.  5 
 ##                    stat p.value   
 ## Gardnerella_Other 0.935   0.005 **
-## Sneathia          0.650   0.010 **
+## Atopobium         0.772   0.010 **
+## Coriobacteriaceae 0.660   0.010 **
+## Sneathia          0.650   0.005 **
+## Gordonibacter     0.601   0.010 **
 ## 
 ##  Group LC  #sps.  1 
 ##                          stat p.value   
@@ -862,13 +656,12 @@ summary(ind.hbaclust.single, alpha=0.01) # list all results with p<=0.01
 ##                         stat p.value   
 ## Lactobacillus_jensenii 0.921   0.005 **
 ## 
-##  Group Other  #sps.  6 
+##  Group Other  #sps.  5 
 ##                                  stat p.value   
-## Campylobacter                   0.835   0.010 **
+## Campylobacter                   0.835   0.005 **
 ## Clostridiales_Incertae_Sedis_XI 0.828   0.005 **
 ## Porphyromonas                   0.794   0.005 **
-## Gallicola                       0.712   0.005 **
-## Peptococcus                     0.703   0.005 **
+## Gallicola                       0.712   0.010 **
 ## Porphyromonadaceae              0.697   0.005 **
 ## 
 ##  Group Bifido+Other  #sps.  1 
@@ -878,6 +671,15 @@ summary(ind.hbaclust.single, alpha=0.01) # list all results with p<=0.01
 ##  Group GV+LJ  #sps.  1 
 ##                        stat p.value   
 ## Gardnerella_vaginalis 0.956   0.005 **
+## 
+##  Group GV+Other  #sps.  2 
+##                            stat p.value   
+## Mobiluncus                0.771   0.005 **
+## TM7_genera_incertae_sedis 0.544   0.010 **
+## 
+##  Group LJ+Other  #sps.  1 
+##              stat p.value   
+## Varibaculum 0.703    0.01 **
 ## 
 ##  Group Bifido+GV+Other  #sps.  1 
 ##            stat p.value   
@@ -909,7 +711,7 @@ summary(ind.hbaclust.single, alpha=0.01) # list all results with p<=0.01
 ## 
 ##  Group Bifido+GV+LC+LG+LJ+Other  #sps.  1 
 ##             stat p.value   
-## Finegoldia 0.876    0.01 **
+## Finegoldia 0.876   0.005 **
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```

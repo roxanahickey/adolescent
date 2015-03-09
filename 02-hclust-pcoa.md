@@ -1,20 +1,22 @@
 # Hierarchical clustering and ordination analysis of vaginal microbiota
 Roxana J. Hickey <roxana.hickey@gmail.com>  
-Last updated January 12, 2015  
+Last updated March 9, 2015  
 
 ***
-# Description
+## Description
 This is a supplement to the paper "Vaginal microbiota of adolescent girls prior to the onset of menarche resemble those of reproductive-age women" by Hickey et al. The code works through the first set of analyses and generation of figures related to the assessment of vaginal microbiota composition in girls and mothers. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd", which prepares the data and color palettes used in this script.
 
 See the project repository at http://github.com/roxanahickey/adolescent for more information.
 
 **Update 2015-01-08: I added "echo=FALSE" options to the chunks of code that make a graph. View full code in R Markdown script.**
 
+**Update 2015-03-09: Updated all figure legends and numbering to be consistent with final publication version (accepted 2015-02-18).**
+
 ## Objective
 The first major objective of this study is to characterize the composition of vaginal microbiota in girls both premenarche and postmenarche as well as mothers in this study. To do this we will first perform hierarchical clustering analysis of the vaginal microbiota from girls and mothers to determine what the major types of communities are and how they are distributed across the sample groups we are interested in. Then we will perform principal coordinates analysis to get a different perspective of the similarity among samples in relation to other variables of interest.
 
 ***
-# Initial setup
+## Initial setup
 After running adolescent-supp-01.Rmd, two RData files named "01-data-prep-[date].RData" and "01-data-prep-last-run.RData" are saved in the data-postproc directory (two files are written so as to preserve older versions if necessary). Load either file to get all of the data necessary to run the analyses and generate figures below.
 
 *Note: If you run the R Markdown script 'as is' from the same directory containing it and the 'data' and 'data-postproc' subdirectories, all figures will be printed inside the resulting PDF or HTML output. If you want to save the figures as individual files, uncomment the lines below starting with 'dir.create()' as well as any lines throughout the script starting with 'ggsave()' or 'pdf()'. I made note of each of these within the chunk code.*
@@ -333,7 +335,9 @@ dev.off()
 Now we visualize community composition as a heatmap along with the UPGMA dendrogram and cluster assignments just determined.
 
 ## Figure 1. Bacterial community composition of the vaginal microbiota of girls and mothers sampled longitudinally.
-Each column in the dendrogram and heatmap represents the vaginal microbiota sampled from a single individual at a single time point. In total 198 samples from 31 girls and 47 samples from 24 mothers are represented. The dendrogram represents the average linkage (UPGMA) hierarchical clustering of samples based on the Bray-Curtis dissimilarity matrix computed from Hellinger-standardized taxon abundance data. The colored bars below the dendrogram represent cluster group (top row) and sample type (second and third rows). Clusters are named to signify the most abundant taxon, when applicable: LC (_Lactobacillus crispatus_ dominant, n=87), LI (_L. iners_, n=71), LG (_L. gasseri_, n=22), LJ (_L. jensenii_, n=8), ‘Bifido’ (_Bifidobacterium_, n=2), GV (_Gardnerella vaginalis_, n=30) and ‘Other’ (n=25). The heatmap represents proportions (before Hellinger standardization) of the 25 overall most abundant taxa within each community as indicated by the legend at top right. Sample type categories include girl/mother and premenarche/postmenarche (no menarche status is indicated for mother samples, colored gray).
+**Note: In the final publication version, I flipped the orientation of the dendrogram horizontally and moved all legend items to the top left of the plot.**
+
+Each column in the dendrogram and heatmap represents the vaginal microbiota sampled from a single individual at a single time point. In total 198 samples from 31 girls and 47 samples from 24 mothers are represented. The dendrogram represents the average linkage (UPGMA) hierarchical clustering of samples based on the Bray-Curtis dissimilarity matrix computed from Hellinger-standardized taxon abundance data. The colored bars below the dendrogram represent cluster group (top row) and sample type (second and third rows). Clusters are named to signify the most abundant taxon, when applicable: LC (_Lactobacillus crispatus_ dominant, n=87), LI (_L. iners_, n=71), LG (_L. gasseri_, n=22), LJ (_L. jensenii_, n=8), ‘Bifido’ (_Bifidobacterium_, n=2), GV (_Gardnerella vaginalis_, n=30) and ‘Other’ (n=25). The heatmap represents proportions (before Hellinger standardization) of the 25 overall most abundant taxa within each community as indicated by the legend at top left. Sample type categories include girl/mother and premenarche/postmenarche (no menarche status is indicated for mother samples, colored gray).
 
 ![plot of chunk fig-1-hclust-heatmap](./02-hclust-pcoa_files/figure-html/fig-1-hclust-heatmap.png) 
 
@@ -366,7 +370,7 @@ Next we want to count up the number of samples in each group (girl pre, girl pos
 Finally, we look at the cluster assignments for all samples from each subject at each visit.
 
 ## Figure 3. Hierarchical cluster assignment over time within individual participants.
-Each panel shows the hierarchical cluster assignment (same as in Figure 1) of vaginal microbiota samples from an individual girl (circles) and her mother (triangles), when applicable. The x-axis indicates the clinical visit at which each sample was collected (visits occurred approximately every three months). Open circles signify premenarcheal status, and filled circles signify postmenarcheal status in girls. The menarcheal status was not recorded for subject 133 at visit 6, indicated by an open circle with crosshatch.
+Each panel shows the hierarchical cluster assignment (same as in Figure 1) of vaginal microbiota samples from an individual girl (circles) and her mother (triangles), when applicable. The x-axis indicates the clinical visit at which each sample was collected (visits occurred approximately every three months). Open circles signify premenarcheal status, and filled circles signify postmenarcheal status in girls. The menarcheal status was not recorded for subject 133 at visit 6, indicated by an open circle with cross.
 
 ![plot of chunk fig-3-hclust-over-time](./02-hclust-pcoa_files/figure-html/fig-3-hclust-over-time.png) 
 

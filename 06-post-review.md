@@ -1,18 +1,20 @@
 # Post-review additional analyses
 Roxana J. Hickey <roxana.hickey@gmail.com>  
-Last updated January 12, 2015  
+Last updated March 9, 2015  
 
 ***
-# Description
+## Description
 This is a supplement to the paper "Vaginal microbiota of adolescent girls prior to the onset of menarche resemble those of reproductive-age women" by Hickey et al. These analyses were added after an initial round of peer review. Minor changes were made to other scripts and noted accordingly.
 
 See the project repository at http://github.com/roxanahickey/adolescent for more information.
+
+**Update 2015-03-09: Updated all figure legends and numbering to be consistent with final publication version (accepted 2015-02-18).**
 
 ## Objective
 These analyses address two reviewer requests: 1) explore how pH varies with respect to community cluster group (from the hierarchical clustering in 02-hclust-pcoa.Rmd) and 2) how community diversity changes with respect to Tanner stage, menarche status and pH.
 
 ***
-# Initial setup
+## Initial setup
 
 Load in data from previous analyses.
 
@@ -135,6 +137,8 @@ sessionInfo()
 ![plot of chunk ph-cluster-box](./06-post-review_files/figure-html/ph-cluster-box.png) 
 
 ## Figure S2. Vaginal pH across hierarchical cluster groups.
+**Note: I annotated the figure with p-values in Illustrator for the final publication version.**
+
 Vaginal microbiota were grouped into hierarchical clusters, listed in the legend at right. A multiple comparisons test using Tukey's method was used to identify significant differences in vaginal pH between clusters. P-values less than 0.05 are shown on the plot with a connector indicating the two groups being compared. Each box represents the interquartile range, the whiskers represent the upper and lower quartiles, the horizontal line represents the median, and open circles represent outliers.
 
 ```
@@ -271,25 +275,25 @@ summary(tukey.mc)
 ## 
 ##  #----Analysis--------------------------------------------------------------------------# 
 ##         Comparison Estimator Lower Upper Statistic   p.Value
-## 1     p( GV , LC )     0.148 0.066 0.298   -5.5802 1.818e-07
-## 2     p( GV , LG )     0.253 0.087 0.544   -2.4476 1.418e-01
-## 3     p( GV , LI )     0.245 0.116 0.445   -3.5383 5.063e-03
-## 4     p( GV , LJ )     0.182 0.032 0.597   -2.2557 2.189e-01
-## 5  p( GV , Other )     0.740 0.409 0.921    2.1033 2.981e-01
-## 6     p( LC , LG )     0.689 0.481 0.841    2.6027 9.897e-02
-## 7     p( LC , LI )     0.573 0.411 0.720    1.2774 8.448e-01
-## 8     p( LC , LJ )     0.787 0.591 0.904    3.9726 9.505e-04
-## 9  p( LC , Other )     0.885 0.627 0.972    3.8183 1.851e-03
-## 10    p( LG , LI )     0.412 0.228 0.625   -1.1670 8.971e-01
-## 11    p( LG , LJ )     0.583 0.229 0.869    0.6171 9.981e-01
-## 12 p( LG , Other )     0.857 0.499 0.973    2.8388 5.113e-02
-## 13    p( LI , LJ )     0.648 0.398 0.836    1.6963 5.688e-01
-## 14 p( LI , Other )     0.835 0.581 0.949    3.5618 4.493e-03
-## 15 p( LJ , Other )     0.923 0.355 0.996    2.2938 2.033e-01
+## 1     p( GV , LC )     0.148 0.066 0.298   -5.5802 1.848e-07
+## 2     p( GV , LG )     0.253 0.087 0.544   -2.4476 1.429e-01
+## 3     p( GV , LI )     0.245 0.116 0.445   -3.5383 5.149e-03
+## 4     p( GV , LJ )     0.182 0.032 0.598   -2.2557 2.197e-01
+## 5  p( GV , Other )     0.740 0.409 0.921    2.1033 2.991e-01
+## 6     p( LC , LG )     0.689 0.481 0.841    2.6027 9.816e-02
+## 7     p( LC , LI )     0.573 0.411 0.720    1.2774 8.450e-01
+## 8     p( LC , LJ )     0.787 0.591 0.904    3.9726 9.565e-04
+## 9  p( LC , Other )     0.885 0.627 0.973    3.8183 1.784e-03
+## 10    p( LG , LI )     0.412 0.228 0.625   -1.1670 8.970e-01
+## 11    p( LG , LJ )     0.583 0.228 0.869    0.6171 9.981e-01
+## 12 p( LG , Other )     0.857 0.498 0.973    2.8388 5.028e-02
+## 13    p( LI , LJ )     0.648 0.398 0.836    1.6963 5.696e-01
+## 14 p( LI , Other )     0.835 0.580 0.949    3.5618 4.740e-03
+## 15 p( LJ , Other )     0.923 0.354 0.996    2.2938 2.026e-01
 ## 
 ##  #----Overall---------------------------------------------------------------------------# 
 ##   Quantile   p.Value
-## 1    2.847 1.818e-07
+## 1    2.849 1.848e-07
 ## 
 ##  #--------------------------------------------------------------------------------------#
 ```
@@ -423,15 +427,14 @@ Let's have a quick look at the distributions and relationships among genus richn
 ## Trends in genus richness and diversity ~ menarche status (vagina + vulva samples)
 ![plot of chunk div-ms-trends](./06-post-review_files/figure-html/div-ms-trends.png) 
 
-## Figure S9. Trends in genus-level richness and Simpson’s diversity index of vaginal and vulvar microbiota with pubertal development and menarche status.
-Genus counts were subsampled at a depth of 2000 observations per sample and used to calculate richness (total number of genera observed) and Simpson's diversity index. In both cases all taxa that could not be classified to the genus level are combined in a single 'Other' category; richness and diversity are therefore underestimated. 415 samples are represented: 181 vaginal samples and 190 vulvar samples from 30 girls, and 44 vaginal samples from 23 mothers. (A) Genus richness in relation to Tanner breast stage (girls only) on the left; richness in relation to menarche status (girls and mothers) on the right. Vagina and vulva samples are represented by light pink and dark magenta coloring, respectively. (B) Simpson's diversity in relation to Tanner breast stage on left, and menarche status on right. Each box represents the interquartile range, the whiskers represent the upper and lower quartiles, the horizontal line represents the median, and open circles represent outliers.
+***Trends in genus-level richness and Simpson’s diversity index of vaginal and vulvar microbiota with pubertal development and menarche status.*** Genus counts were subsampled at a depth of 2000 observations per sample and used to calculate richness (total number of genera observed) and Simpson's diversity index. In both cases all taxa that could not be classified to the genus level are combined in a single 'Other' category; richness and diversity are therefore underestimated. 415 samples are represented: 181 vaginal samples and 190 vulvar samples from 30 girls, and 44 vaginal samples from 23 mothers. (A) Genus richness in relation to Tanner breast stage (girls only) on the left; richness in relation to menarche status (girls and mothers) on the right. Vagina and vulva samples are represented by light pink and dark magenta coloring, respectively. (B) Simpson's diversity in relation to Tanner breast stage on left, and menarche status on right. Each box represents the interquartile range, the whiskers represent the upper and lower quartiles, the horizontal line represents the median, and open circles represent outliers.
 
 ```
 ## Scale for 'fill' is already present. Adding another scale for 'fill', which will replace the existing scale.
 ## Scale for 'fill' is already present. Adding another scale for 'fill', which will replace the existing scale.
 ```
 
-![plot of chunk fig-s9-diversity](./06-post-review_files/figure-html/fig-s9-diversity.png) 
+![plot of chunk diversity](./06-post-review_files/figure-html/diversity.png) 
 
 ## Trends in genus richness and diversity ~ vaginal pH (vagina samples only)
 
@@ -477,8 +480,7 @@ Genus counts were subsampled at a depth of 2000 observations per sample and used
 
 ![plot of chunk div-ph-trends](./06-post-review_files/figure-html/div-ph-trends.png) 
 
-# Figure S10. Genus-level richness, Simpson’s diversity index and vaginal pH.
-Each point represents a vaginal sample from either a girl or a mother. Vaginal pH was recorded for 120 samples from 24 girls and 37 samples from 21 mothers. (A) Genus-level richness plotted against vaginal pH. A locally weighted scatterplot smoothing (LOESS) function was applied separately to girl and mother data points, with 95% confidence intervals indicated by the light grey regions. (B) Genus-level Simpson's diversity index plotted against vaginal pH with LOESS curves for girls and mothers.
+***Genus-level richness, Simpson’s diversity index and vaginal pH.*** Each point represents a vaginal sample from either a girl or a mother. Vaginal pH was recorded for 120 samples from 24 girls and 37 samples from 21 mothers. (A) Genus-level richness plotted against vaginal pH. A locally weighted scatterplot smoothing (LOESS) function was applied separately to girl and mother data points, with 95% confidence intervals indicated by the light grey regions. (B) Genus-level Simpson's diversity index plotted against vaginal pH with LOESS curves for girls and mothers.
 
 ```
 ## Scale for 'colour' is already present. Adding another scale for 'colour', which will replace the existing scale.
@@ -501,7 +503,7 @@ Each point represents a vaginal sample from either a girl or a mother. Vaginal p
 ## Warning: Removed 69 rows containing missing values (geom_point).
 ```
 
-![plot of chunk fig-s10-ph-diversity](./06-post-review_files/figure-html/fig-s10-ph-diversity.png) 
+![plot of chunk ph-diversity](./06-post-review_files/figure-html/ph-diversity.png) 
 
 ***
 # Save R workspace

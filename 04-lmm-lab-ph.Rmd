@@ -2,7 +2,7 @@
 title: "Linear mixed-effects modeling of trends in lactic acid bacteria proportion
   and vaginal pH"
 author: "Roxana J. Hickey <roxana.hickey@gmail.com>"
-date: "Last updated January 12, 2015"
+date: "Last updated March 9, 2015"
 output:
   html_document:
     keep_md: yes
@@ -12,18 +12,20 @@ output:
 ---
 
 ***
-# Description
+## Description
 This is a supplement to the paper "Vaginal microbiota of adolescent girls prior to the onset of menarche resemble those of reproductive-age women" by Hickey et al. The code works through linear mixed effects modeling of trends observed in lactic acid bacteria and vaginal pH of perimenarcheal girls. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd", "02-hclust-pcoa.Rmd" and "03-community-dynamics.Rmd".
 
 See the project repository at http://github.com/roxanahickey/adolescent for more information.
 
 **Update 2015-01-08: I added “echo=FALSE” options to the chunks of code that make a graph. View full code in R Markdown script.**
 
+**Update 2015-03-09: Updated all figure legends and numbering to be consistent with final publication version (accepted 2015-02-18).**
+
 ## Objective
 Previously in our qualitative assessment of vaginal microbiota dynamic trends over time, we saw that lactic acid bacteria (LAB) tended to increase as girls progressed through puberty, while vaginal pH decreased. This analysis attempts to explain and quantify the observed trends in relation to Tanner stage, menarche status, and age.
 
 ***
-# Initial setup
+## Initial setup
 
 Clear the workspace, load data from the previous step, and load necessary packages.
 

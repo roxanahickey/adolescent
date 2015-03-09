@@ -434,7 +434,7 @@ if (key) {
   else if (scale == "column")
     mtext(side = 1, "Column Z-Score", line = 2)
 #  else mtext(side = 1, KeyValueName, line = 2)
-  else mtext(side = 1, "Percent Abundance", line = 2.2,cex=0.7)
+  else mtext(side = 1, "Proportion", line = 2.2,cex=0.7)
   if (density.info == "density") {
     dens <- density(x, adjust = densadj, na.rm = TRUE)
     omit <- dens$x < min(breaks) | dens$x > max(breaks)

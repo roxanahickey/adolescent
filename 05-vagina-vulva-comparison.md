@@ -1,14 +1,16 @@
 # Comparisons of girls' vaginal and vulvar microbiota
 Roxana J. Hickey <roxana.hickey@gmail.com>  
-Last updated January 12, 2015  
+Last updated March 9, 2015  
 
 ***
-# Description
+## Description
 This is a supplement to the paper "Vaginal microbiota of adolescent girls prior to the onset of menarche resemble those of reproductive-age women" by Hickey et al. The code works through comparisons of vaginal and vulvar microbiota of perimenarcheal girls. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd".
 
 See the project repository at http://github.com/roxanahickey/adolescent for more information.
 
 **Update 2015-01-08: I added “echo=FALSE” options to the chunks of code that make a graph. View full code in R Markdown script.**
+
+**Update 2015-03-09: Updated all figure legends and numbering to be consistent with final publication version (accepted 2015-02-18).**
 
 ## Objective
 In earlier analyses ("02-hclust-pcoa.Rmd", "03-community-dynamics.Rmd", "04-lmm-lab-ph.Rmd") we focused on vaginal microbiota; now we want to extend our analyses to compare vulvar microbiota alongside vaginal microbiota. Here we perform hierarchical clustering and PCoA with both vaginal and vulvar data (similar to in "02-hclust-pcoa.Rmd") in addition to correlation analysis (part III) and indicator species analysis (part IV).
@@ -234,7 +236,9 @@ dev.off()
 
 Now we visualize community composition as a heatmap along with the UPGMA dendrogram and cluster assignments just determined:
 
-## Figure S8. Bacterial community composition of the vulvar and vaginal microbiota of girls and vaginal microbiota of mothers sampled longitudinally.
+## Figure S6. Bacterial community composition of the vulvar and vaginal microbiota of girls and vaginal microbiota of mothers sampled longitudinally.
+**Note: In the final publication version, I flipped the orientation of the dendrogram horizontally and moved all legend items to the top left of the plot.**
+
 Each column in the dendrogram and heatmap represents the vulvar or vaginal microbiota sampled from a single individual at a single point in time. In total 456 samples are represented: 198 vaginal samples and 211 vulvar samples from 31 girls, and 47 vaginal samples from 24 mothers. e dendrogram represents the average linkage (UPGMA) hierarchical clustering of samples based on the Bray-Curtis dissimilarity matrix computed from Hellinger standardized taxon abundance data. The colored bars below the dendrogram represent sample type (girl/mother, vagina/vulva) and hierarchical cluster assignments. Clusters are named to signify the most abundant taxon, when applicable: LC (_Lactobacillus crispatus_ dominant, n=134), ‘Other’ (n=117), LI (_L. iners_, n=107), LG (_L. gasseri_, n=49), GV (_Gardnerella vaginalis_, n=47), and ‘Bifido’ (_Bifidobacterium_, n=3). e heatmap represents proportions (prior to Hellinger standardization) of the 25 overall most abundant taxa within each community as indicated by the legend at top right.
 
 
@@ -257,7 +261,7 @@ Each column in the dendrogram and heatmap represents the vulvar or vaginal micro
 ##     lowess
 ```
 
-![plot of chunk fig-s8-hclust-heatmap-hellinger-bray-upgma](./05-vagina-vulva-comparison_files/figure-html/fig-s8-hclust-heatmap-hellinger-bray-upgma.png) 
+![plot of chunk fig-s6-hclust-heatmap-hellinger-bray-upgma](./05-vagina-vulva-comparison_files/figure-html/fig-s6-hclust-heatmap-hellinger-bray-upgma.png) 
 
 ```
 ## null device 
@@ -526,9 +530,9 @@ summary(ind.girl.sampletype, alpha=0.01) # list all results with p<=0.01
 ##  Significance level (alpha): 0.01
 ## 
 ##  Total number of species: 79
-##  Selected number of species: 34 
+##  Selected number of species: 36 
 ##  Number of species associated to 1 group: 0 
-##  Number of species associated to 2 groups: 12 
+##  Number of species associated to 2 groups: 14 
 ##  Number of species associated to 3 groups: 22 
 ## 
 ##  List of species associated to each combination: 
@@ -538,28 +542,30 @@ summary(ind.girl.sampletype, alpha=0.01) # list all results with p<=0.01
 ## Lactobacillus_gigeriorum   0.487   0.005 **
 ## Lactobacillus_coleohominis 0.435   0.005 **
 ## 
-##  Group girl.vag.pre+girl.vul.pre  #sps.  5 
+##  Group girl.vag.pre+girl.vul.pre  #sps.  6 
 ##                                stat p.value   
 ## Mobiluncus                    0.605   0.005 **
 ## Propionimicrobium             0.497   0.005 **
 ## Fastidiosipila                0.480   0.005 **
 ## Lachnospiracea_incertae_sedis 0.412   0.010 **
 ## Actinobaculum                 0.331   0.005 **
+## Arcanobacterium               0.327   0.005 **
 ## 
-##  Group girl.vul.post+girl.vul.pre  #sps.  5 
+##  Group girl.vul.post+girl.vul.pre  #sps.  6 
 ##                     stat p.value   
 ## Segniliparus       0.609   0.005 **
 ## Murdochiella       0.590   0.005 **
 ## Fusobacterium      0.577   0.005 **
-## Olsenella          0.412   0.005 **
+## Paraprevotella     0.413   0.010 **
+## Olsenella          0.412   0.010 **
 ## Peptostreptococcus 0.350   0.005 **
 ## 
 ##  Group girl.vag.post+girl.vul.post+girl.vul.pre  #sps.  4 
 ##                  stat p.value   
 ## Actinomycetales 0.684   0.005 **
-## Staphylococcus  0.604   0.005 **
+## Staphylococcus  0.604   0.010 **
 ## Veillonellaceae 0.473   0.005 **
-## Megasphaera     0.458   0.005 **
+## Megasphaera     0.458   0.010 **
 ## 
 ##  Group girl.vag.pre+girl.vul.post+girl.vul.pre  #sps.  18 
 ##                                  stat p.value   
@@ -578,9 +584,9 @@ summary(ind.girl.sampletype, alpha=0.01) # list all results with p<=0.01
 ## Streptococcus_Other             0.567   0.005 **
 ## Varibaculum                     0.562   0.005 **
 ## Peptococcus                     0.540   0.005 **
-## Porphyromonadaceae              0.529   0.010 **
+## Porphyromonadaceae              0.529   0.005 **
 ## Anaerovorax                     0.503   0.005 **
-## Actinomyces                     0.471   0.010 **
+## Actinomyces                     0.471   0.005 **
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -625,13 +631,13 @@ summary(ind.hbaclust.single, alpha=0.01) # list all results with p<=0.01
 ##  Significance level (alpha): 0.01
 ## 
 ##  Total number of species: 79
-##  Selected number of species: 30 
-##  Number of species associated to 1 group: 14 
-##  Number of species associated to 2 groups: 5 
-##  Number of species associated to 3 groups: 7 
-##  Number of species associated to 4 groups: 3 
+##  Selected number of species: 23 
+##  Number of species associated to 1 group: 11 
+##  Number of species associated to 2 groups: 3 
+##  Number of species associated to 3 groups: 8 
+##  Number of species associated to 4 groups: 1 
 ##  Number of species associated to 5 groups: 0 
-##  Number of species associated to 6 groups: 1 
+##  Number of species associated to 6 groups: 0 
 ## 
 ##  List of species associated to each combination: 
 ## 
@@ -640,13 +646,10 @@ summary(ind.hbaclust.single, alpha=0.01) # list all results with p<=0.01
 ## Bifidobacterium 0.982   0.005 **
 ## Aerococcus      0.967   0.005 **
 ## 
-##  Group GV  #sps.  5 
+##  Group GV  #sps.  2 
 ##                    stat p.value   
 ## Gardnerella_Other 0.935   0.005 **
 ## Atopobium         0.772   0.010 **
-## Coriobacteriaceae 0.660   0.010 **
-## Sneathia          0.650   0.005 **
-## Gordonibacter     0.601   0.010 **
 ## 
 ##  Group LC  #sps.  1 
 ##                          stat p.value   
@@ -660,30 +663,26 @@ summary(ind.hbaclust.single, alpha=0.01) # list all results with p<=0.01
 ##                                  stat p.value   
 ## Campylobacter                   0.835   0.005 **
 ## Clostridiales_Incertae_Sedis_XI 0.828   0.005 **
-## Porphyromonas                   0.794   0.005 **
-## Gallicola                       0.712   0.010 **
-## Porphyromonadaceae              0.697   0.005 **
+## Porphyromonas                   0.794   0.010 **
+## Peptococcus                     0.703   0.010 **
+## Propionimicrobium               0.651   0.005 **
 ## 
 ##  Group Bifido+Other  #sps.  1 
 ##               stat p.value   
-## Segniliparus 0.709   0.005 **
+## Segniliparus 0.709    0.01 **
 ## 
 ##  Group GV+LJ  #sps.  1 
 ##                        stat p.value   
 ## Gardnerella_vaginalis 0.956   0.005 **
 ## 
-##  Group GV+Other  #sps.  2 
-##                            stat p.value   
-## Mobiluncus                0.771   0.005 **
-## TM7_genera_incertae_sedis 0.544   0.010 **
+##  Group GV+Other  #sps.  1 
+##             stat p.value   
+## Mobiluncus 0.771   0.005 **
 ## 
-##  Group LJ+Other  #sps.  1 
-##              stat p.value   
-## Varibaculum 0.703    0.01 **
-## 
-##  Group Bifido+GV+Other  #sps.  1 
-##            stat p.value   
-## Dialister 0.928   0.005 **
+##  Group Bifido+GV+Other  #sps.  2 
+##                  stat p.value   
+## Dialister       0.928   0.005 **
+## Veillonellaceae 0.699   0.005 **
 ## 
 ##  Group Bifido+LG+LJ  #sps.  1 
 ##                       stat p.value   
@@ -697,21 +696,9 @@ summary(ind.hbaclust.single, alpha=0.01) # list all results with p<=0.01
 ## Clostridiales 0.858   0.005 **
 ## Anaerosphaera 0.850   0.005 **
 ## 
-##  Group Bifido+LC+LJ+Other  #sps.  1 
-##                  stat p.value   
-## Actinomycetales 0.705    0.01 **
-## 
 ##  Group GV+LI+LJ+Other  #sps.  1 
 ##                      stat p.value   
 ## Lactobacillus_iners 0.891   0.005 **
-## 
-##  Group LC+LG+LJ+Other  #sps.  1 
-##                 stat p.value   
-## Corynebacterium 0.79    0.01 **
-## 
-##  Group Bifido+GV+LC+LG+LJ+Other  #sps.  1 
-##             stat p.value   
-## Finegoldia 0.876   0.005 **
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```

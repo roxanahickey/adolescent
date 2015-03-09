@@ -1,14 +1,16 @@
 # Vaginal microbiota dynamics and pubertal development
 Roxana J. Hickey <roxana.hickey@gmail.com>  
-Last updated January 12, 2015  
+Last updated March 9, 2015  
 
 ***
-# Description
+## Description
 This is a supplement to the paper "Vaginal microbiota of adolescent girls prior to the onset of menarche resemble those of reproductive-age women" by Hickey et al. The code works through qualitative analyses and generation of figures related to community dynamics of vaginal and vulvar microbiota over time. The analyses can be run directly from the R Markdown file using RStudio. It should be run after "01-data-prep.Rmd" and "02-hclust-pcoa.Rmd".
 
 See the project repository at http://github.com/roxanahickey/adolescent for more information.
 
 **Update 2015-01-08: I added “echo=FALSE” options to the chunks of code that make a graph. View full code in R Markdown script.**
+
+**Update 2015-03-09: Updated all figure legends and numbering to be consistent with final publication version (accepted 2015-02-18).**
 
 ## Objective
 Earlier analyses dealt with characterizing vaginal microbiota composition and identifying major groups using clustering and ordination approaches. Next, we will take a closer look at the dynamics of these communities over time as girls progress through puberty and menarche. Special attention is devoted to assessing trends in the relative abundance of lactic acid bacteria and vaginal pH, as these are generally considered indicators of a 'healthy' vaginal microbiota in reproductive age women.
@@ -105,7 +107,7 @@ unfactor <- function(x){
 ***
 # I: Summarize community dynamics of vaginal (and vulvar) microbiota
 
-First we will create an individual summary for each individual participant (and her mother, if applicable) to look at community composition of the vaginal and vulvar microbiota, along with selected metadata, at every visit during the study. The output is a PDF file with each page containing the following plots for a given subject (these are referred to as Appendix S2 in the paper):
+First we will create an individual summary for each individual participant (and her mother, if applicable) to look at community composition of the vaginal and vulvar microbiota, along with selected metadata, at every visit during the study. The output is a PDF file with each page containing the following plots for a given subject (this is included as Figure S4 in the paper):
 
 * Community composition of girl's vaginal microbiota
 * Community composition of girl's vulvar microbiota
@@ -124,7 +126,7 @@ g_legend <- function(a.gplot){
   legend <- tmp$grobs[[leg]]
   return(legend)}
 
-# uncomment line below to write appendix S2
+# uncomment line below to write figure s4
 # source("scripts/community_dynamics_profiles.R")
 ```
 
@@ -303,7 +305,7 @@ gg.tb.dot.109 <- ggplot(mp.s109, aes(x=visit, y=subject,
 ```
 
 ## Figure 4. Transitions to _Lactobacillus_-dominant vaginal microbiota in four perimenarcheal girls.
-Panels show the vaginal bacterial community profiles and associated pubertal development of four participants sampled longitudinally. Bar plots represent the proportions of bacterial taxa in the community (legend at bottom left). Below each bar plot the menarcheal status and clinician-assessed Tanner stage of breast development are indicated by point shape and color, respectively (legend at bottom right). Empty spaces in the plots indicate a skipped visit.
+Panels show the vaginal bacterial community profiles and associated pubertal development of four participants sampled longitudinally. Bar plots represent the proportions of bacterial taxa in the community (legend at bottom left). Below each bar plot the menarcheal status and clinician-assessed Tanner stage of breast development are indicated by symbol fill and color, respectively (legend at bottom right). Empty spaces in the plots indicate a skipped visit.
 
 **Update 2015-01-08: changed to Figure 4, previously Figure 5.**
 
@@ -334,7 +336,7 @@ unique(meta.vag.gard.10$subject) # n=11
 meta.vag.gard.10.fullobs <- meta.vag[meta.vag$subject %in% meta.vag.gard.10$subject,]
 ```
 
-## Figure S4. Proportion of _Gardnerella_ over time in the vaginal microbiota of girls.
+## Figure S5. Proportion of _Gardnerella_ over time in the vaginal microbiota of girls.
 _Gardnerella_ was present in the vaginal microbiota at a relative abundance of 10% or greater at least once in 11/31 adolescent participants. Each panel shows the proportion of _Gardnerella_ (encompassing sequence reads assigned to either the species level as _G. vaginalis_ or genus level as _Gardnerella_) in the vaginal microbiota of a single participant at each clinical visit. Open circles represent premenarcheal samples, and filled circles represent postmenarcheal samples. The x-axis indicates the clinical visit at which each sample was collected; visits occurred approximately every three months.
 
 
@@ -342,7 +344,7 @@ _Gardnerella_ was present in the vaginal microbiota at a relative abundance of 1
 ## geom_path: Each group consist of only one observation. Do you need to adjust the group aesthetic?
 ```
 
-![plot of chunk fig-s4-gardnerella-vag](./03-community-dynamics_files/figure-html/fig-s4-gardnerella-vag.png) 
+![plot of chunk fig-s5-gardnerella-vag](./03-community-dynamics_files/figure-html/fig-s5-gardnerella-vag.png) 
 
 ## _Gardnerella_ in vaginal and vulvar microbiota
 
@@ -415,8 +417,7 @@ cor.sp
 ## tan.br.self      0.5678       0.7072    0.6336      1.0000
 ```
 
-## Figure S5. Correlations of Tanner breast and pubic scores according to self and clinician assessment.
-Spearman’s correlation coefficients were calculated to determine how well breast/pubic scores agreed for both clinician- (upper left) and self-assessment (upper right). Physician- and self-assessments for Tanner breast (lower left) and Tanner pubic (lower right) scores were also correlated. Correlation coefficients are reported in the header of each plot. Physician-assessed Tanner breast scores were primarily used for analyses described in the paper.
+***Correlations of Tanner breast and pubic scores according to self and clinician assessment.*** Spearman’s correlation coefficients were calculated to determine how well breast/pubic scores agreed for both clinician- (upper left) and self-assessment (upper right). Physician- and self-assessments for Tanner breast (lower left) and Tanner pubic (lower right) scores were also correlated. Correlation coefficients are reported in the header of each plot. Physician-assessed Tanner breast scores were primarily used for analyses described in the paper.
 
 
 ```
@@ -426,7 +427,7 @@ Spearman’s correlation coefficients were calculated to determine how well brea
 ## Warning: Removed 12 rows containing missing values (geom_point).
 ```
 
-![plot of chunk fig-s5-tanner-correlations](./03-community-dynamics_files/figure-html/fig-s5-tanner-correlations.png) 
+![plot of chunk tanner-correlations](./03-community-dynamics_files/figure-html/tanner-correlations.png) 
 
 ```
 ## null device 
@@ -526,15 +527,14 @@ Upper and lower panels show box plots of (A) the logit-transformed proportion of
 
 An interesting observation was that not all samples with high proportions of LAB were associated with a low pH. We hypothesized this could be due to lower total bacterial counts in the vaginas of adolescent girls. We performed a coarse test of that hypothesis but were unable to detect a significant difference in estimated number of 16S rRNA gene copies.
 
-## Figure S6. Relationship between proportion of lactic acid bacteria and pH in vaginal samples collected from girls.
-197 vaginal microbiota samples from perimenarcheal girls are plotted to show the relationship between the proportion of lactic acid bacteria (LAB; includes _Lactobacillus_, _Streptococcus_, _Aerococcus_ and _Facklamia_) on the x-axis and vaginal pH on the y-axis. Menarche status is either premenarcheal (open circles) or postmenarcheal (filled circles). Points are color-coded to indicate Tanner stage of breast development (clinician-assessed) as indicated by the legend at right (NA values are colored gray). Points are slightly jittered to decrease crowding around similar values. The magenta dashed line at vaginal pH 4.5 represents the upper range of the traditional ‘hallmark’ healthy vaginal pH of 4.0-4.5.
+***Relationship between proportion of lactic acid bacteria and pH in vaginal samples collected from girls.*** 197 vaginal microbiota samples from perimenarcheal girls are plotted to show the relationship between the proportion of lactic acid bacteria (LAB; includes _Lactobacillus_, _Streptococcus_, _Aerococcus_ and _Facklamia_) on the x-axis and vaginal pH on the y-axis. Menarche status is either premenarcheal (open circles) or postmenarcheal (filled circles). Points are color-coded to indicate Tanner stage of breast development (clinician-assessed) as indicated by the legend at right (NA values are colored gray). Points are slightly jittered to decrease crowding around similar values. The magenta dashed line at vaginal pH 4.5 represents the upper range of the traditional ‘hallmark’ healthy vaginal pH of 4.0-4.5.
 
 
 ```
 ## Warning: Removed 68 rows containing missing values (geom_point).
 ```
 
-![plot of chunk fig-s6-lab-ph](./03-community-dynamics_files/figure-html/fig-s6-lab-ph.png) 
+![plot of chunk lab-ph-scatterplot](./03-community-dynamics_files/figure-html/lab-ph-scatterplot.png) 
 
 ***
 # Save R workspace

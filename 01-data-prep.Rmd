@@ -1,7 +1,7 @@
 ---
 title: "Preparation of bacterial read abundance data and participant metadata"
 author: "Roxana J. Hickey <roxana.hickey@gmail.com> and Matthew L. Settles <mattsettles@gmail.com>"
-date: "Last updated January 12, 2015"
+date: "Last updated March 9, 2015"
 output:
   html_document:
     keep_md: yes
@@ -11,15 +11,17 @@ output:
 ---
 
 ***
-# Description
+## Description
 This is a supplement to the paper "Vaginal microbiota of adolescent girls prior to the onset of menarche resemble those of reproductive-age women" by Hickey et al. The code works through the preparation of bacterial read abundance data (from Roche 454 pyrosequencing) and participant metadata for subsequent analysis. It also generates the custom color palettes used to make figures for downstream analyses. The analyses can be run directly from the R Markdown file using RStudio. Before starting, you will want to check that the necessary packages are installed (see the library calls in the first section).
 
 See the project repository at http://github.com/roxanahickey/adolescent for more information.
 
 **Update 2015-01-08: I added "echo=FALSE" options to the chunks of code that make a graph. View full code in R Markdown script.**
 
+**Update 2015-03-09: Updated all figure legends and numbering to be consistent with final publication version (accepted 2015-02-18).**
+
 ***
-# Initial setup
+## Initial setup
 ```{r setup}
 ## Clear current workspace
 rm(list=ls())
@@ -603,7 +605,7 @@ source("./scripts/hcoplot.R") # from Borcard, Gillet and Legendre (2009) Numeric
 Finally, now that we have our bacterial abundance data, metadata and color palettes defined, we can make Figure S1, which is a summary of all the samples collected from girls and mothers during the study.
 
 ## Figure S1. Summary of all vaginal and vulvar samples collected from girls and mothers.
-Each panel shows all of the vaginal and vulvar samples collected from an individual participant (circles), as well as vaginal samples collected from her mother (triangles) when applicable. The x-axis indicates the clinical visit at which each sample was collected; visits occurred approximately every three months. Open circles signify premenarcheal status, and filled circles signify postmenarcheal status in girls. e menarcheal status was unknown for subject 133 at visit 6, indicated by an open circle with crosshatch. Points are color-coded to signify the Tanner breast stage of the girls as shown in the legend at top right (mother samples and those with missing values are colored gray).
+Each panel shows all of the vaginal and vulvar samples collected from an individual participant (circles), as well as vaginal samples collected from her mother (triangles) when applicable. The x-axis indicates the clinical visit at which each sample was collected; visits occurred approximately every three months. Open circles signify premenarcheal status, and filled circles signify postmenarcheal status in girls. The menarcheal status was unknown for subject 133 at visit 6, indicated by an open circle with crosshatch. Points are color-coded to signify the Tanner breast stage of the girls as shown in the legend at top right (mother samples and those with missing values are colored gray).
 
 ```{r fig-s1-samplessummary, fig.width=8, fig.height=6, echo=FALSE}
 ggplot(meta, aes(y=type.site, x=visit, color=factor(tan.br.dr), shape=men.stat)) +

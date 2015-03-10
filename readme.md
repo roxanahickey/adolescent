@@ -15,7 +15,7 @@ Raw 454 sequence data are available via NCBI SRA/BioProject:
 The analyses are separated into six sections available in regular Markdown (.md) and R Markdown (.Rmd) format (click on the links to view the Markdown files to see the full code and embedded figures):
 * [01-data-prep](https://github.com/roxanahickey/adolescent/blob/master/01-data-prep.md) includes the initial setup of taxon data, participant metadata, and custom functions and color palettes.
 * [02-hclust-pcoa](https://github.com/roxanahickey/adolescent/blob/master/02-hclust-pcoa.md) covers the hierarchical clustering and ordination (PCoA) approaches used to compare vaginal microbiota samples.
-* [03-community-dynamics](https://github.com/roxanahickey/adolescent/blob/master/03-community-dynamics.md) generates Appendix S2 and goes through exploratory data analysis of vaginal microbiota dynamics.
+* [03-community-dynamics](https://github.com/roxanahickey/adolescent/blob/master/03-community-dynamics.md) generates community composition/metadata profiles and goes through exploratory data analysis of vaginal microbiota dynamics.
 * [04-lmm-lab-ph](https://github.com/roxanahickey/adolescent/blob/master/04-lmm-lab-ph.md) includes the linear mixed-effects modeling of trends in lactic acid bacteria proportions and pH in relation to participant metadata.
 * [05-vagina-vulva-comparison](https://github.com/roxanahickey/adolescent/blob/master/05-vagina-vulva-comparison.md) includes analyses performed to compare vaginal and vulvar microbiota samples.
 * [06-post-review](https://github.com/roxanahickey/adolescent/blob/master/06-post-review.md) includes additional analyses performed following an initial round of peer review. (added 2015-01-12)

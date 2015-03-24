@@ -4,7 +4,7 @@
 
 This repository contains the data and code necessary to reproduce the analyses and figures presented in the following publication:
 
-Hickey RJ, Zhou X, Settles ML, Erb J, Malone K, Hansmann MA, Shew ML, Van Der Pol B, Fortenberry JD, Forney LJ. 2015. Vaginal microbiota of adolescent girls prior to the onset of menarche resemble those of reproductive-age women. mBio 6(2):e00097-15. doi:10.1128/mBio.00097-15.
+Hickey RJ, Zhou X, Settles ML, Erb J, Malone K, Hansmann MA, Shew ML, Van Der Pol B, Fortenberry JD, Forney LJ. 2015. Vaginal microbiota of adolescent girls prior to the onset of menarche resemble those of reproductive-age women. mBio 6(2):e00097-15. [doi:10.1128/mBio.00097-15.](http://mbio.asm.org/content/6/2/e00097-15.long)
 
 This work was presented previously in [talk](http://www.slideshare.net/roxana_hickey/hickeyuometa2014talk) and [poster](http://www.slideshare.net/roxana_hickey/hickey-isme15-poster) format.
 
